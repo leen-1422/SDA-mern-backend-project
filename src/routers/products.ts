@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import {Product} from '../models/productSchema'
+import Product from '../models/productSchema'
 import Order from '../models/order'
 import ApiError from '../errors/ApiError'
 
