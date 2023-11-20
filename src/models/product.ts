@@ -6,15 +6,34 @@ const productSchema = new mongoose.Schema(
       type: String,
       index: true,
       required: true,
+      unique: true,
+    },
+    image: {
+      type: String,
+      required: true,
     },
     description: {
       type: String,
       required: true,
     },
-    quantity: {
+    sizes: {
+      type: [String],
+      required: true,
+    },
+    // categories:{
+    //   type: [mongoose.Schema.Types.ObjectId],
+    //   ref: 'Categories',
+    //   required: true,
+    // },
+
+    price: {
       type: Number,
       default: 1,
+      required: true,
     },
+  },
+  {
+    timestamps: true,
   }
 )
 
