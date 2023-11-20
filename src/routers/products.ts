@@ -1,11 +1,9 @@
 import express from 'express'
 const router = express.Router()
 
-import Product from '../models/productSchema'
+import Product from '../models/product'
 import Order from '../models/order'
 import ApiError from '../errors/ApiError'
-
-
 
 router.get('/', async (_, res) => {
   const products = await Product.find()
@@ -14,21 +12,17 @@ router.get('/', async (_, res) => {
 })
 
 router.post('/', async (req, res, next) => {
-  const { name, description, image, categories, sizes, price } = req.body
+  const { name, description, quantity } = req.body
 
   if (!name || !description) {
     next(ApiError.badRequest('Name and Description are requried'))
     return
   }
+
   const product = new Product({
     name,
-    image,
     description,
-    categories,
-    sizes,
-    price
-
-    
+    quantity,
   })
 
   await product.save()

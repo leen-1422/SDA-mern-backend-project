@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import Product  from '../models/productSchema'
+import Product from '../models/product'
 import ApiError from '../errors/ApiError'
 
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,14 +11,14 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
   }
 }
 export const createProducts = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, description, price } = req.body;
+  const { title, description, price } = req.body
 
-  console.log('Received Request Body:', req.body);
+  console.log('Received Request Body:', req.body)
 
   if (!title.trim() || !description.trim()) {
-    console.error('Title or description is missing or empty in the request body');
-    next(ApiError.badRequest('Name and Description are required'));
-    return;
+    console.error('Title or description is missing or empty in the request body')
+    next(ApiError.badRequest('Name and Description are required'))
+    return
   }
 
   try {
@@ -26,13 +26,13 @@ export const createProducts = async (req: Request, res: Response, next: NextFunc
       title,
       description,
       price,
-    });
+    })
 
-    await product.save();
-    console.log('Product created successfully:', product);
-    res.status(201).json({ message: 'Product created successfully', product });
+    await product.save()
+    console.log('Product created successfully:', product)
+    res.status(201).json({ message: 'Product created successfully', product })
   } catch (error) {
-    console.error('Error creating product:', error);
-    next(error);
+    console.error('Error creating product:', error)
+    next(error)
   }
 }
