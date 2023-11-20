@@ -1,14 +1,14 @@
-import mongoose from "mongoose"
-import { dev } from ".";
+// import mongoose from "mongoose"
+// import { dev } from ".";
 
-export const connectDB = async () => {
-   try {
+// export const connectDB = async () => {
+//    try {
     
-    await mongoose.connect(dev.db.url);
-    console.log("db is connected")
+//     await mongoose.connect(dev.db.url);
+//     console.log("db is connected")
 
-   } catch (error) {
-    console.error(error);
+//    } catch (error) {
+//     console.error(error);
     
-   }
-}
+//    }
+// }
