@@ -12,17 +12,19 @@ router.get('/', async (_, res) => {
 })
 
 router.post('/', async (req, res, next) => {
-  const { name, description, quantity } = req.body
+  const { name, description, image , sizes, price } = req.body
 
-  if (!name || !description) {
+  if (!name || !description || !image || !sizes || !price) {
     next(ApiError.badRequest('Name and Description are requried'))
     return
   }
 
   const product = new Product({
     name,
-    description,
-    quantity,
+      description,
+      image,
+      sizes,
+      price,
   })
 
   await product.save()

@@ -15,9 +15,9 @@ Please ask your instructor or supporting instructor if you have any questions or
 
 In this level, the application includes the following features:
 
-1. Create all the needed models for the backend to function.
-2. Create routes to handle CRUD requests.
-3. Implement a route to handle GET requests for fetching a specific item or product based on a unique identifier (e.g., item ID or product ID).
+1. Create all the needed models for the backend to function.✅
+2. Create routes to handle CRUD requests.✅
+3. Implement a route to handle GET requests for fetching a specific item or product based on a unique identifier (e.g., item ID or product ID).✅
 
 ## Level 2: Additional Requirements
 
