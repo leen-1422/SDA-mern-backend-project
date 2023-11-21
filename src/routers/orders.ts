@@ -3,6 +3,7 @@ const router = express.Router()
 
 import Order from '../models/order'
 import User from '../models/user'
+import ApiError from '../errors/ApiError'
 
 router.get('/', async (req, res) => {
   const orders = await Order.find().populate('products')
@@ -10,22 +11,26 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res, next) => {
-  const { name, products } = req.body
+  const { productId, userId, purchasedAt, firstName, products } = req.body
 
+  if (!firstName || !products) {
+    next(ApiError.badRequest('all fieldes are required'))
+    return
+  }
   const order = new Order({
-    name,
+    productId,
+    userId,
+    purchasedAt,
+    firstName,
     products,
   })
   console.log('orderId:', order._id)
-
-  const user = new User({
-    name: 'Walter',
-    order: order._id,
-  })
+  
 
   await order.save()
-  await user.save()
   res.json(order)
 })
+
+
 
 export default router
