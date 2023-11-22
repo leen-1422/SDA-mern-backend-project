@@ -7,51 +7,60 @@ import Product from '../models/product'
 import mongoose from 'mongoose'
 import product from '../models/product'
 const ObjectId = mongoose.Types.ObjectId
- 
 
-//final 
+//final
 router.get('/', async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const startIndex = (page - 1) * limit;
-  const lastIndex = page*limit
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
+  const startIndex = (page - 1) * limit
+  const lastIndex = page * limit
+  const sortBy = req.query.sortBy
 
-  let searchQuery = {};
-  if (req.query.name) {
-    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
+  // let searchQuery = {};
+  // if (req.query.name) {
+  //   searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
+  // }
+
+  let sortOption = {}
+
+  if (sortBy === 'price') {
+    const price = Number(req.query.price)
+    if (price === 1) {
+      sortOption = { price: 1 } // Ascending order
+    } else if (price === -1) {
+      sortOption = { price: -1 } // Descending order
+    }
+  } else if (sortBy === 'name') {
+    const name = Number(req.query.name)
+    if (name === 1) {
+      sortOption = { name: 1 } // Ascending order by name
+    } else if (name === -1) {
+      sortOption = { name: -1 } // Descending order by name
+    }
   }
 
   const result = { next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find(searchQuery).skip(startIndex).limit(limit);
-  const totalPages = await Product.countDocuments(searchQuery);
- 
+  const products = await Product.find().skip(startIndex).limit(limit).sort(sortOption)
+  const totalPages = await Product.countDocuments()
 
-  result.result = products;
+  result.result = products
 
-  if (lastIndex <  totalPages) {
+  if (lastIndex < totalPages) {
     result.next = {
       page: page + 1,
       limit: limit,
-    };
+    }
   }
 
   if (startIndex > 0) {
     result.previous = {
       page: page - 1,
       limit: limit,
-    };
+    }
   }
 
-  res.json({
-    status: "success",
-    count: products.length,
-    page,
-    totalPages,
-    data: result,
-  });
-});
-
-  
+  res.json(result)
+})
 
 // create a new product
 router.post('/', async (req, res, next) => {
