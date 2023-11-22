@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
   let searchQuery = {};
   if (req.query.name) {
     searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
+<<<<<<< Updated upstream
   }
 
   const result = { next: {}, previous: {}, result: [] as {} }
@@ -27,6 +28,33 @@ router.get('/', async (req, res) => {
  
 
   result.result = products;
+=======
+  }
+
+  let sortOption = {}
+
+  if (sortBy === 'price') {
+    const price = Number(req.query.price)
+    if (price === 1) {
+      sortOption = { price: 1 } // Ascending order
+    } else if (price === -1) {
+      sortOption = { price: -1 } // Descending order
+    }
+  } else if (sortBy === 'name') {
+    const name = Number(req.query.name)
+    if (name === 1) {
+      sortOption = { name: 1 } // Ascending order by name
+    } else if (name === -1) {
+      sortOption = { name: -1 } // Descending order by name
+    }
+  }
+
+  const result = { next: {}, previous: {}, result: [] as {} }
+  const filteredCount  = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
+  const totalPages = Math.ceil(Number(filteredCount )/ limit);
+
+  result.result = filteredCount
+>>>>>>> Stashed changes
 
   if (lastIndex <  totalPages) {
     result.next = {
