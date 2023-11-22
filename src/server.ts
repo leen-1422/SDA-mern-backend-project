@@ -1,40 +1,48 @@
-import express from 'express'
-import mongoose from 'mongoose'
-import { config } from 'dotenv'
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import myLogger from './middlewares/logger';
+import apiErrorHandler from './middlewares/errorHandler';
 
-import usersRouter from './routers/users'
-import productsRouter from './routers/products'
-import ordersRouter from './routers/orders'
-import categoryRouter from './routers/categories'
-import apiErrorHandler from './middlewares/errorHandler'
-import myLogger from './middlewares/logger'
+dotenv.config();
 
-config()
-const app = express()
-const PORT = 5050
-const URL = process.env.ATLAS_URL as string
+const app = express();
+const PORT = process.env.PORT || 5050;
+const URL = process.env.ATLAS_URL as string;
 
-app.use(myLogger)
+// Middleware
+app.use(myLogger);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors()); // Enable CORS
 
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+// Routes
+import usersRouter from './routers/users';
+import productsRouter from './routers/products';
+import ordersRouter from './routers/orders';
+import categoryRouter from './routers/categories';
 
-app.use('/api/users', usersRouter)
-app.use('/api/orders', ordersRouter)
-app.use('/api/products', productsRouter)
-app.use('/api/categories', categoryRouter)
+app.use('/api/users', usersRouter);
+app.use('/api/orders', ordersRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/categories', categoryRouter);
 
-app.use(apiErrorHandler)
+// Error handling middleware
+app.use(apiErrorHandler);
 
+// Connect to MongoDB
 mongoose
   .connect(URL)
   .then(() => {
-    console.log('Database connected')
+    console.log('Database connected');
   })
   .catch((err) => {
-    console.log('MongoDB connection error, ', err)
-  })
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log('Server running http://localhost:' + PORT)
-})
+  console.log(`Server running at http://localhost:${PORT}`);
+});
