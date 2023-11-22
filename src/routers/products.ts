@@ -7,23 +7,19 @@ import Product from '../models/product'
 import mongoose from 'mongoose'
 import product from '../models/product'
 const ObjectId = mongoose.Types.ObjectId
- 
 
-//final 
+//final
 router.get('/', async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const startIndex = (page - 1) * limit;
-  const lastIndex = page*limit
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
+  const startIndex = (page - 1) * limit
+  const lastIndex = page * limit
   const sortBy = req.query.sortBy
-
-  let searchQuery = {};
+  let searchQuery = {}
   if (req.query.name) {
-    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
+    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } }
   }
-
   let sortOption = {}
-
   if (sortBy === 'price') {
     const price = Number(req.query.price)
     if (price === 1) {
@@ -39,25 +35,21 @@ router.get('/', async (req, res) => {
       sortOption = { name: -1 } // Descending order by name
     }
   }
-
   const result = { next: {}, previous: {}, result: [] as {} }
-  const filteredCount  = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
-  const totalPages = Math.ceil(Number(filteredCount )/ limit);
-
-  result.result = filteredCount
-
-  if (lastIndex <  totalPages) {
+  const products = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
+  const totalPages = await Product.countDocuments()
+  result.result = products
+  if (lastIndex < totalPages) {
     result.next = {
       page: page + 1,
       limit: limit,
-    };
+    }
   }
-
   if (startIndex > 0) {
     result.previous = {
       page: page - 1,
       limit: limit,
-    };
+    }
   }
 
   res.json({

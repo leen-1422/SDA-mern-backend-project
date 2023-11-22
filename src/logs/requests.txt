@@ -177,8 +177,11 @@ Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:12 AM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:29 AM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:45 AM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:02:04 AM
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> main
 Method: GET, Path: /api/orders, Date: 11/22/2023, Time: 1:59:26 PM
 Method: GET, Path: /api/orders/655c93c71355d73f816c8224, Date: 11/22/2023, Time: 1:59:40 PM
 Method: GET, Path: /api/orders/655c93c71355d73f816c8224, Date: 11/22/2023, Time: 2:02:49 PM
@@ -235,6 +238,7 @@ Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 4:31:49 PM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 4:32:05 PM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 4:32:09 PM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 4:42:28 PM
+<<<<<<< HEAD
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 9:01:05 PM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 9:01:23 PM
 Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 9:01:30 PM
@@ -255,3 +259,16 @@ Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 9:06:34 PM
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:12:14 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:13:14 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:14:05 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:14:26 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:14:36 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:15:16 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:16:39 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:19:54 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:20:04 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:20:17 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 8:20:45 PM
+>>>>>>> main

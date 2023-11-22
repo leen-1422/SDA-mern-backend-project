@@ -39,7 +39,7 @@ router.put('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res, next) => {
-  const { name, firstName, lastName, email, password, role } = req.body
+  const { firstName, lastName, email, password, role } = req.body
 
   if (!firstName ) {
     next(ApiError.badRequest('username are required'))
