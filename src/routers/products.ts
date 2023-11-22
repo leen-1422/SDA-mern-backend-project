@@ -15,14 +15,11 @@ router.get('/', async (req, res) => {
   const startIndex = (page - 1) * limit
   const lastIndex = page * limit
   const sortBy = req.query.sortBy
-
-  // let searchQuery = {};
-  // if (req.query.name) {
-  //   searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
-  // }
-
+  let searchQuery = {}
+  if (req.query.name) {
+    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } }
+  }
   let sortOption = {}
-
   if (sortBy === 'price') {
     const price = Number(req.query.price)
     if (price === 1) {
@@ -38,20 +35,16 @@ router.get('/', async (req, res) => {
       sortOption = { name: -1 } // Descending order by name
     }
   }
-
   const result = { next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find().skip(startIndex).limit(limit).sort(sortOption)
+  const products = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
   const totalPages = await Product.countDocuments()
-
   result.result = products
-
   if (lastIndex < totalPages) {
     result.next = {
       page: page + 1,
       limit: limit,
     }
   }
-
   if (startIndex > 0) {
     result.previous = {
       page: page - 1,
