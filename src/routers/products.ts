@@ -15,20 +15,11 @@ router.get('/', async (req, res) => {
   const limit = Number(req.query.limit) || 10;
   const startIndex = (page - 1) * limit;
   const lastIndex = page*limit
+  const sortBy = req.query.sortBy
 
   let searchQuery = {};
   if (req.query.name) {
     searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
-<<<<<<< Updated upstream
-  }
-
-  const result = { next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find(searchQuery).skip(startIndex).limit(limit);
-  const totalPages = await Product.countDocuments(searchQuery);
- 
-
-  result.result = products;
-=======
   }
 
   let sortOption = {}
@@ -54,7 +45,6 @@ router.get('/', async (req, res) => {
   const totalPages = Math.ceil(Number(filteredCount )/ limit);
 
   result.result = filteredCount
->>>>>>> Stashed changes
 
   if (lastIndex <  totalPages) {
     result.next = {
@@ -71,11 +61,7 @@ router.get('/', async (req, res) => {
   }
 
   res.json({
-    status: "success",
-    count: products.length,
-    page,
-    totalPages,
-    data: result,
+    result,
   });
 });
 
