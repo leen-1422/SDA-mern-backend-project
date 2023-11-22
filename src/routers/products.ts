@@ -8,10 +8,33 @@ import mongoose from 'mongoose'
 const ObjectId = mongoose.Types.ObjectId
 
 // fetech all products
-router.get('/', async (_, res) => {
-  const products = await Product.find()
-  console.log('products:', products)
-  res.json(products)
+router.get('/', async (req, res) => {
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
+  const startIndex = (page - 1) * limit
+  const lastIndex = page * limit
+
+  const result = { next: {}, previous: {}, result: [] as {} }
+  const products = await Product.find().skip(startIndex).limit(limit)
+  const totalPages = await Product.countDocuments();
+
+
+  result.result = products
+  if (lastIndex < totalPages) {
+    result.next = {
+      page: page,
+      limit: limit,
+    }
+  }
+  if (startIndex > 0) {
+    result.previous = {
+      page: page - 1,
+      limit: limit,
+    }
+  }
+
+  console.log('products:', products, 'total', totalPages)
+  res.json(result)
 })
 
 // create a new product
