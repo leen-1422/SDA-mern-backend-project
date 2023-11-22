@@ -5,37 +5,53 @@ import ApiError from '../errors/ApiError'
 import Product from '../models/product'
 
 import mongoose from 'mongoose'
+import product from '../models/product'
 const ObjectId = mongoose.Types.ObjectId
+ 
 
-// fetech all products
+//final 
 router.get('/', async (req, res) => {
-  const page = Number(req.query.page)
-  const limit = Number(req.query.limit)
-  const startIndex = (page - 1) * limit
-  const lastIndex = page * limit
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const startIndex = (page - 1) * limit;
+  const lastIndex = page*limit
+
+  let searchQuery = {};
+  if (req.query.name) {
+    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } };
+  }
 
   const result = { next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find().skip(startIndex).limit(limit)
-  const totalPages = await Product.countDocuments();
+  const products = await Product.find(searchQuery).skip(startIndex).limit(limit);
+  const totalPages = await Product.countDocuments(searchQuery);
+ 
 
+  result.result = products;
 
-  result.result = products
-  if (lastIndex < totalPages) {
+  if (lastIndex <  totalPages) {
     result.next = {
-      page: page,
+      page: page + 1,
       limit: limit,
-    }
+    };
   }
+
   if (startIndex > 0) {
     result.previous = {
       page: page - 1,
       limit: limit,
-    }
+    };
   }
 
-  console.log('products:', products, 'total', totalPages)
-  res.json(result)
-})
+  res.json({
+    status: "success",
+    count: products.length,
+    page,
+    totalPages,
+    data: result,
+  });
+});
+
+  
 
 // create a new product
 router.post('/', async (req, res, next) => {

@@ -1,30 +1,31 @@
 import mongoose from 'mongoose'
-
+export enum Role {
+  USER = 'user',
+  ADMIN = 'admin',
+}
 
 const userSchema = new mongoose.Schema({
-
-  firstName:{
+  firstName: {
     type: String,
     required: true,
-
   },
-  lastName:{
+  lastName: {
     type: String,
     required: true,
-
   },
-  email:{
+  email: {
     type: String,
     required: true,
-
   },
-  password:{
+  password: {
     type: String,
-    required: true
+    required: true,
   },
-  role:{
+  role: {
     type: String,
-    required: true
+    enum: Role,
+    default: Role.USER,
+    required: true,
   },
 
   // relation between order and user should be many orders to one user

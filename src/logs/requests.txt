@@ -168,3 +168,12 @@ Method: GET, Path: /api/products, Date: 11/21/2023, Time: 9:27:03 PM
 Method: GET, Path: /api/products, Date: 11/21/2023, Time: 9:27:19 PM
 Method: GET, Path: /api/products, Date: 11/21/2023, Time: 9:27:31 PM
 Method: GET, Path: /api/products, Date: 11/21/2023, Time: 9:27:37 PM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 10:44:52 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 10:45:21 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 10:47:37 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 10:56:58 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 10:59:13 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:12 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:29 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:01:45 AM
+Method: GET, Path: /api/products/, Date: 11/22/2023, Time: 11:02:04 AM

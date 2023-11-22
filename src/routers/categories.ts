@@ -70,12 +70,7 @@ router.put('/:categoryId', async (req, res) => {
     category: newCategory,
   })
 })
-// // DELETE ALL Categories
-// router.delete('/', async (req, res) => {
-//   await Category.deleteMany()
 
-//   res.status(204).send()
-// })
 
 // DELETE Category by ID
 router.delete('/:categoryId', async (req, res) => {
