@@ -1,46 +1,64 @@
-import express from 'express'
+import express from 'express';
+import Category from '../models/category';
+import ApiError from '../errors/ApiError';
 
-import Category from '../models/category'
-import ApiError from '../errors/ApiError'
-const router = express.Router()
+const router = express.Router();
 
+// GET All Categories
 router.get('/', async (req, res) => {
-  const categories = await Category.find()
-
-  res.status(200).json(categories)
-})
-
-router.get('/:categoryId', async (req, res) => {
-  const categoryId = req.params.categoryId
-  const category = await Category.findById(categoryId)
-
-  res.status(200).json(category)
-})
-
-router.post('/', async (req, res, next) => {
-  const name = req.body.name
-
-  if (!name) {
-    next(ApiError.badRequest('Name is requried'))
-    return
+  try {
+    const categories = await Category.find();
+    res.status(200).json(categories);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
   }
+});
 
-  const category = new Category({
-    name,
-  })
+// GET Category by ID
+router.get('/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const category = await Category.findById(categoryId);
+    res.status(200).json(category);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+});
 
-  await category.save()
+// CREATE Category
+router.post('/', async (req, res, next) => {
+  try {
+    const name = req.body.name;
+    if (!name) {
+      next(ApiError.badRequest('Name is required'));
+      return;
+    }
+    // Create a new category instance with the provided name
+    const category = new Category({
+      name,
+    });
 
-  res.status(201).json({
-    category,
-  })
-})
+    await category.save();
+    res.status(201).json({
+      category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+});
 
+// UPDATE Category
 router.put('/:categoryId', async (req, res) => {
   const newName = req.body.name
   const categoryId = req.params.categoryId
 
-  const newCat = await Category.findByIdAndUpdate(
+  const newCategory = await Category.findByIdAndUpdate(
     categoryId,
     { name: newName },
     {
@@ -49,25 +67,29 @@ router.put('/:categoryId', async (req, res) => {
   )
 
   res.json({
-    category: newCat,
+    category: newCategory,
   })
 })
-
-// ONLY DO THIS ENDPOINT IF YOU REALLY WANT TO DELETE THE DATA
+// // DELETE ALL Categories
 // router.delete('/', async (req, res) => {
 //   await Category.deleteMany()
 
 //   res.status(204).send()
 // })
 
+// DELETE Category by ID
 router.delete('/:categoryId', async (req, res) => {
-  const { categoryId } = req.params
+  try {
+    const  categoryId  = req.params.categoryId
+    await Category.deleteOne({
+      _id: categoryId,
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+});
 
-  await Category.deleteOne({
-    _id: categoryId,
-  })
-
-  res.status(204).send()
-})
-
-export default router
+export default router;
