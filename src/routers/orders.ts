@@ -13,7 +13,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res, next) => {
   const { productId, userId, purchasedAt, firstName, products } = req.body
 
-  if (!firstName || !products) {
+  if (!firstName || !products || !userId) {
+    
     next(ApiError.badRequest('all fieldes are required'))
     return
   }
