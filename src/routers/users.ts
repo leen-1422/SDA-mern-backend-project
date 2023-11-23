@@ -70,7 +70,7 @@ router.get('/:userId/page/:page', (req, res) => {
 
 router.get('/', async (_, res) => {
   const users = await User.find()
-  // .populate('order')
+  .populate('order')
   res.json({
     users,
   })
