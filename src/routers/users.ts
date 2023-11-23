@@ -28,7 +28,7 @@ router.put('/:id', async (req, res) => {
       })
 
     }
-    const updatedUser = await User.findById (id);
+    const updatedUser = await User.findById(id);
     res.status(200).json(updatedUser)
   } catch (error) {
     res.status(500).json({
@@ -39,7 +39,11 @@ router.put('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res, next) => {
+<<<<<<< HEAD
+  const {  firstName, lastName, email, password, role } = req.body
+=======
   const { firstName, lastName, email, password, role } = req.body
+>>>>>>> main
 
   if (!firstName ) {
     next(ApiError.badRequest('username are required'))
