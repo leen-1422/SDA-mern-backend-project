@@ -39,11 +39,8 @@ router.put('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res, next) => {
-<<<<<<< HEAD
   const {  firstName, lastName, email, password, role } = req.body
-=======
-  const { firstName, lastName, email, password, role } = req.body
->>>>>>> main
+
 
   if (!firstName ) {
     next(ApiError.badRequest('username are required'))
@@ -74,7 +71,7 @@ router.get('/:userId/page/:page', (req, res) => {
 
 router.get('/', async (_, res) => {
   const users = await User.find()
-  // .populate('order')
+  .populate('order')
   res.json({
     users,
   })

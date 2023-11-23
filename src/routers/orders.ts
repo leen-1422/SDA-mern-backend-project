@@ -1,37 +1,48 @@
 import express from 'express'
+import Order from '../models/order'
+import ApiError from '../errors/ApiError'
+import mongoose from 'mongoose'
+
 const router = express.Router()
 
-import Order from '../models/order'
-import User from '../models/user'
-import ApiError from '../errors/ApiError'
-
 router.get('/', async (req, res) => {
-  const orders = await Order.find().populate('products')
+  const orders = await Order.find().populate('products.product').populate('userId')
+
   res.json(orders)
 })
 
 router.post('/', async (req, res, next) => {
-  const { productId, userId, purchasedAt, firstName, products } = req.body
+  try {
+    const { userId, purchasedAt, firstName, products } = req.body
 
-  if (!firstName || !products || !userId) {
-    
-    next(ApiError.badRequest('all fieldes are required'))
-    return
+    if (!firstName || !products || !userId) {
+      throw ApiError.badRequest('All fields are required')
+    }
+
+    // Ensure that products array contains valid ObjectId values
+    const validProductIds = products.map((product: { product: any }) => product.product);
+    const areValidProductIds = validProductIds.every(mongoose.Types.ObjectId.isValid);
+
+    if (!areValidProductIds) {
+      throw ApiError.badRequest('Invalid product ObjectId in the products array');
+    }
+
+    const order = new Order({
+      userId,
+      purchasedAt,
+      firstName,
+      products,
+    })
+
+    console.log('orderId:', order._id)
+
+    await order.save()
+
+    res.json(order)
+  } catch (error) {
+    next(error)
   }
-  const order = new Order({
-    productId,
-    userId,
-    purchasedAt,
-    firstName,
-    products,
-  })
-  console.log('orderId:', order._id)
-  
-
-  await order.save()
-  res.json(order)
 })
-
 
 
 export default router
