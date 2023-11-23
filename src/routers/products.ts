@@ -1,13 +1,10 @@
 import express from 'express'
 const router = express.Router()
-
 import ApiError from '../errors/ApiError'
 import Product from '../models/product'
-
 import mongoose from 'mongoose'
-import product from '../models/product'
 const ObjectId = mongoose.Types.ObjectId
-
+ 
 //final
 router.get('/', async (req, res) => {
   const page = Number(req.query.page)
@@ -55,23 +52,29 @@ router.get('/', async (req, res) => {
   res.json(result)
 })
 
-  
 
+
+
+  
 // create a new product
 router.post('/', async (req, res, next) => {
-  const { name, description, image, sizes, price } = req.body
-  if (!name || !description || !image || !sizes || !price) {
-    next(ApiError.badRequest('all fileds are required'))
+  const { name, description, image, price, sizes, quantity, category } = req.body
+  
+  console.log(category)
+  if (!name || !description || !image || !price || !sizes || !category) {
+    next(ApiError.badRequest('All fields are requried'))
     return
   }
   const product = new Product({
     name,
-    image,
     description,
-    // categories,
+    quantity,
+    category,
     sizes,
     price,
+    image,
   })
+  console.log(product)
   await product.save()
   res.json(product)
 })
@@ -94,7 +97,7 @@ router.delete('/:id', async (req, res, next) => {
 // update product
 
 router.put('/:id', async (req, res, next) => {
-  const { id } = req.params
+  const  id  = req.params.id
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))
     return

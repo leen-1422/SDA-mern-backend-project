@@ -8,23 +8,25 @@ export type OrderDocument = Document & {
 const orderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Client',
     required: true,
   },
   purchasedAt: {
     type: Date,
     default: Date.now,
   },
-  products: [{
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+  products: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
     },
-    quantity: {
-      type: Number,
-      default: 1,
-    }
-  }],
+  ],  
 })
 
 export default mongoose.model<OrderDocument>('Order', orderSchema)

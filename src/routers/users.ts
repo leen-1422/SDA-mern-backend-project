@@ -28,7 +28,7 @@ router.put('/:id', async (req, res) => {
       })
 
     }
-    const updatedUser = await User.findById (id);
+    const updatedUser = await User.findById(id);
     res.status(200).json(updatedUser)
   } catch (error) {
     res.status(500).json({
@@ -70,7 +70,7 @@ router.get('/:userId/page/:page', (req, res) => {
 
 router.get('/', async (_, res) => {
   const users = await User.find()
-  // .populate('order')
+  .populate('order')
   res.json({
     users,
   })
