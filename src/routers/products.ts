@@ -37,7 +37,8 @@ router.get('/', async (req, res) => {
   }
   const result = { next: {}, previous: {}, result: [] as {} }
   const products = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
-  const totalPages = await Product.countDocuments()
+  const filteredCount  = await Product.countDocuments(searchQuery);
+  const totalPages = Math.ceil(filteredCount / limit);
   result.result = products
   if (lastIndex < totalPages) {
     result.next = {
@@ -45,17 +46,14 @@ router.get('/', async (req, res) => {
       limit: limit,
     }
   }
-  if (startIndex > 0) {
-    result.previous = {
-      page: page - 1,
-      limit: limit,
+  if ((startIndex + limit) < filteredCount) {
+    result.next = {
+        page: page + 1,
+        limit: limit,
     }
-  }
-
-  res.json({
-    result,
-  });
-});
+}
+  res.json(result)
+})
 
   
 
