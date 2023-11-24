@@ -44,6 +44,11 @@ function generateActivationToken(){
   return crypto.randomBytes(32).toString("hex")
 
 }
+
+
+
+
+
 router.post('/register',ValidateUser, async (req, res, next) => {
   const {  email, password } = req.body
   const userExists = await User.findOne({email})

@@ -101,7 +101,7 @@ router.delete('/:id', async (req, res, next) => {
     next(ApiError.badRequest('bad request'))
     return
   }
-  const product = await Product.findByIdAndDelete(id)
+  const product = await Product.findByIdAndDelete()
   if (!product) {
     next(ApiError.badRequest(`cannot find product with ${id}`))
     return
