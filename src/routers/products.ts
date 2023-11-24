@@ -4,7 +4,7 @@ import ApiError from '../errors/ApiError'
 import Product from '../models/product'
 import mongoose from 'mongoose'
 const ObjectId = mongoose.Types.ObjectId
- 
+
 //final
 router.get('/', async (req, res) => {
   const page = Number(req.query.page)
@@ -12,30 +12,49 @@ router.get('/', async (req, res) => {
   const startIndex = (page - 1) * limit
   const lastIndex = page * limit
   const sortBy = req.query.sortBy
-  let searchQuery = {}
-  if (req.query.name) {
+  const search = req.query.search
+  const category = req.query.category
+  // let searchQuery = {}
+  let searchQuery: { name?: { $regex: RegExp }; price?: { $gte: number }; category?: string } = {}
+
+  if (search) {
     searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } }
   }
+  if (category && typeof category === 'string') {
+    searchQuery.category = category
+  }
+
+  if (req.query.minPrice) {
+    searchQuery.price = { $gte: Number(req.query.minPrice) }
+  }
+
   let sortOption = {}
-  if (sortBy === 'price') {
-    const price = Number(req.query.price)
-    if (price === 1) {
-      sortOption = { price: 1 } // Ascending order
-    } else if (price === -1) {
-      sortOption = { price: -1 } // Descending order
-    }
-  } else if (sortBy === 'name') {
-    const name = Number(req.query.name)
-    if (name === 1) {
-      sortOption = { name: 1 } // Ascending order by name
-    } else if (name === -1) {
-      sortOption = { name: -1 } // Descending order by name
+  if (sortBy) {
+    if (sortBy === 'price') {
+      const price = Number(req.query.price)
+      if (price === 1) {
+        sortOption = { price: 1 } // Ascending order
+      } else if (price === -1) {
+        sortOption = { price: -1 } // Descending order
+      }
+    } else if (sortBy === 'name') {
+      const name = Number(req.query.name)
+      if (name === 1) {
+        sortOption = { name: 1 } // Ascending order by name
+      } else if (name === -1) {
+        sortOption = { name: -1 } // Descending order by name
+      }
     }
   }
+
   const result = { next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find(searchQuery).skip(startIndex).limit(limit).sort(sortOption)
-  const filteredCount  = await Product.countDocuments(searchQuery);
-  const totalPages = Math.ceil(filteredCount / limit);
+  const products = await Product.find(searchQuery)
+    .sort(sortOption)
+    .populate('category')
+    .skip(startIndex)
+    .limit(limit)
+  const filteredCount = await Product.countDocuments(searchQuery)
+  const totalPages = Math.ceil(filteredCount / limit)
   result.result = products
   if (lastIndex < totalPages) {
     result.next = {
@@ -43,23 +62,19 @@ router.get('/', async (req, res) => {
       limit: limit,
     }
   }
-  if ((startIndex + limit) < filteredCount) {
+  if (startIndex + limit < filteredCount) {
     result.next = {
-        page: page + 1,
-        limit: limit,
+      page: page + 1,
+      limit: limit,
     }
-}
+  }
   res.json(result)
 })
 
-
-
-
-  
 // create a new product
 router.post('/', async (req, res, next) => {
   const { name, description, image, price, sizes, quantity, category } = req.body
-  
+
   console.log(category)
   if (!name || !description || !image || !price || !sizes || !category) {
     next(ApiError.badRequest('All fields are requried'))
@@ -97,7 +112,7 @@ router.delete('/:id', async (req, res, next) => {
 // update product
 
 router.put('/:id', async (req, res, next) => {
-  const  id  = req.params.id
+  const id = req.params.id
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))
     return
