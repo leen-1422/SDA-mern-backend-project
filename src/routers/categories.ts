@@ -1,6 +1,7 @@
 import express from 'express';
 import Category from '../models/category';
 import ApiError from '../errors/ApiError';
+import { validateCategory } from '../middlewares/validateCategory';
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.get('/:categoryId', async (req, res) => {
 });
 
 // CREATE Category
-router.post('/', async (req, res, next) => {
+router.post('/',validateCategory, async (req, res, next) => {
   try {
     const name = req.body.name;
     if (!name) {
