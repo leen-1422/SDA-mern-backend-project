@@ -11,23 +11,18 @@ router.get('/', async (req, res) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const startIndex = (page - 1) * limit;
-
     let searchQuery: { name?: { $regex: RegExp }; price?: { $gte: number } } = {};
-
     if (req.query.name) {
       searchQuery.name = { $regex: new RegExp(String(req.query.name), 'i') };
     }
     if (req.query.minPrice) {
       searchQuery.price = { $gte: Number(req.query.minPrice) };
     }
-
     const result = { next: {}, previous: {}, result: [] as {} };
-
     const products = await Product.find(searchQuery)
       .populate('category')
       .skip(startIndex)
       .limit(limit);
-
     const totalProducts = await Product.countDocuments(searchQuery);
     result.result = products;
 
@@ -60,7 +55,6 @@ router.get('/', async (req, res) => {
     });
   }
 });
-
 
 
 
