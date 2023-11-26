@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
-import { ValidateUser } from '../middlewares/validateUser'
+import { ValidateUser } from '../middlewares/validations'
 const router = express.Router()
 
 
