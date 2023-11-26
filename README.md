@@ -25,7 +25,7 @@ In addition to the basic requirements, the application enhances its functionalit
 
 1. Include pagination functionality to retrieve items or products in batches or limit the number of items returned in a single request. ✅
 2. Implement a route to handle GET requests with query parameters for filtering items or products based on specific criteria (e.g., by category, price range). ✅
-3. Add validation checks to ensure the data meets certain criteria before performing create or update operations (e.g., validating required fields, data format) using Zod.
+3. Add validation checks to ensure the data meets certain criteria before performing create or update operations (e.g., validating required fields, data format) using Zod. ✅
 4. Create routes to handle GET requests to fetch items or products sorted in a specific order (e.g., by title, by date added).✅
 
 ## Level 3: Bonus Requirements (Optional)
