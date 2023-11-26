@@ -2,7 +2,7 @@ import express from 'express'
 import Order from '../models/order'
 import ApiError from '../errors/ApiError'
 import mongoose from 'mongoose'
-import { validateOrder } from '../middlewares/validateOrder'
+import { validateOrder } from '../middlewares/validations'
 
 const router = express.Router()
 
@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
     res.json(orders)
   } catch (error) {
     console.error(error)
-    next(ApiError.internal('Something went wrong. Please check the server logs.'))
+    next(ApiError.internal('Something went wrong.'))
   }
 })
 
@@ -20,7 +20,7 @@ router.post('/', validateOrder, async (req, res, next) => {
   try {
     const { firstName, userId, purchasedAt, products } = req.body
 
-    if (!products || !userId || !purchasedAt || !firstName) {
+    if (!firstName ||!products || !userId || !purchasedAt ) {
       throw ApiError.badRequest('All fields are required')
     }
 
