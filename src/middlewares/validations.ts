@@ -49,8 +49,6 @@ export function validateOrder(req: Request, res: Response, next: NextFunction) {
     .max(20, { message: "Name can have at most 20 characters" }),
     userId: zod.string(),
     purchasedAt: zod.string(),
-    quantity: zod.number()
-    .int().min(1, { message: "Quantity must be at least 1" }), 
     products: zod.array(
       zod.object({
         product: zod.string(),
