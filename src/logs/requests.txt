@@ -917,3 +917,12 @@ Method: GET, Path: /api/users, Date: 11/25/2023, Time: 2:36:13 AM
 Method: GET, Path: /api/users, Date: 11/25/2023, Time: 2:38:23 AM
 Method: POST, Path: /api/users, Date: 11/25/2023, Time: 2:38:31 AM
 Method: POST, Path: /api/users/register, Date: 11/25/2023, Time: 2:38:48 AM
+Method: GET, Path: /api/products, Date: 11/26/2023, Time: 11:20:41 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:22:57 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:23:24 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:23:41 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:24:18 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:25:20 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:25:37 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:28:12 AM
+Method: POST, Path: /api/products/, Date: 11/26/2023, Time: 11:28:21 AM
