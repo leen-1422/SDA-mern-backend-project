@@ -6,6 +6,10 @@ export type OrderDocument = Document & {
 }
 
 const orderSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
