@@ -13,9 +13,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { userId, purchasedAt, firstName, products } = req.body
+    const { userId, purchasedAt, products } = req.body
 
-    if (!firstName || !products || !userId) {
+    if ( !products || !userId || !purchasedAt) {
       throw ApiError.badRequest('All fields are required')
     }
 
@@ -30,7 +30,6 @@ router.post('/', async (req, res, next) => {
     const order = new Order({
       userId,
       purchasedAt,
-      firstName,
       products,
     })
 

@@ -1,7 +1,10 @@
 import express, { NextFunction } from 'express'
+import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
+import { ValidateUser } from '../middlewares/validateUser'
 const router = express.Router()
 
 
@@ -37,28 +40,41 @@ router.put('/:id', async (req, res) => {
   }
 
 })
+function generateActivationToken(){
+  return crypto.randomBytes(32).toString("hex")
 
-router.post('/', async (req, res, next) => {
-  const { firstName, lastName, email, password, role } = req.body
+}
 
-  if (!firstName ) {
-    next(ApiError.badRequest('username are required'))
-    return
+
+
+
+
+router.post('/register',ValidateUser, async (req, res, next) => {
+  const {  email, password } = req.body
+  const userExists = await User.findOne({email})
+  if (userExists){
+    return next (ApiError.badRequest("Email already registered"))
   }
-  const user = new User({
-   
-    firstName,
-    lastName,
+
+  const activationToken = generateActivationToken()
+
+  const hashedPassword = await bcrypt.hash(password , 10)
+  console.log("hashedPassword", hashedPassword)
+
+  const newUser = new User ({
     email,
-    password,
-    role,
+    password: hashedPassword,
+    activationToken,
   })
 
-  await user.save()
-  res.status(201).send({
-    message: 'user is created',
+  await newUser.save()
+   res.json({
+    msg: "the user is created ",
+   user:newUser,
+
+   })
   })
-})
+
 
 
 router.get('/:userId/page/:page', (req, res) => {
