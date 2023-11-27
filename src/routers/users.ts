@@ -67,7 +67,6 @@ async function sendActivationEmail(userEmail: string, activationToken: string) {
   console.log('info', info)
 }
 
-
 router.post('/register', validateUser, async (req, res, next) => {
   const { email, password } = req.validateUser
   const userExists = await User.findOne({ email })
