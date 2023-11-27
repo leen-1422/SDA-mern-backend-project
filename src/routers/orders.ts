@@ -57,8 +57,6 @@ router.post('/', async (req, res, next) => {
       total: totalPrice,
     })
 
-    console.log('orderId:', order._id)
-
     await order.save()
 
     res.json(order)
