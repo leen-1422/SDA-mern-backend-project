@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { boolean } from 'zod'
 function validateRole(role: string) {
   if (role === 'USER' || role === 'ADMIN') {
     return true

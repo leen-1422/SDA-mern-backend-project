@@ -52,7 +52,7 @@ export function validateProducts(req: Request, res: Response, next: NextFunction
 export function validateOrder(req: Request, res: Response, next: NextFunction) {
   const schema = zod.object({
     firstName: zod.string()
-    .min(7, { message: "Name must have at least  characters" })
+    .min(7, { message: "Name must have at least 7 characters" })
     .max(20, { message: "Name can have at most 20 characters" }),
     userId: zod.string(),
     purchasedAt: zod.string(),

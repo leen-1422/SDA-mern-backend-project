@@ -4,8 +4,6 @@ declare namespace Express {
     validateUser: {
     email: string
     password: string
-    firstName: string
-    lastName: string
   }
   decodedUser: {
     userId: string
