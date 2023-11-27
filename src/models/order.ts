@@ -2,7 +2,7 @@ import mongoose, { Document } from 'mongoose'
 
 export type OrderDocument = Document & {
   name: string
-  products: mongoose.Schema.Types.ObjectId[]
+  orderItems: mongoose.Schema.Types.ObjectId[]
 }
 
 const orderSchema = new mongoose.Schema({
@@ -19,18 +19,19 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  products: [
+  orderItems: [
     {
-      product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-      },
-      quantity: {
-        type: Number,
-        default: 1,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'OrderItems',
     },
-  ],  
+  ],
+  status: {
+    type: String,
+    default: 'pending',
+  },
+  total: {
+    type: Number,
+  },
 })
 
 export default mongoose.model<OrderDocument>('Order', orderSchema)

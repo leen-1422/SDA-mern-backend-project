@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
-import { ValidateUser } from '../middlewares/validations'
+import { validateUser } from '../middlewares/validations'
 const router = express.Router()
 
 
@@ -44,13 +44,8 @@ function generateActivationToken(){
   return crypto.randomBytes(32).toString("hex")
 
 }
-
-
-
-
-
-router.post('/register',ValidateUser, async (req, res, next) => {
-  const {  email, password } = req.body
+router.post('/register',validateUser, async (req, res, next) => {
+  const {  email, password, firstName, lastName } = req.body
   const userExists = await User.findOne({email})
   if (userExists){
     return next (ApiError.badRequest("Email already registered"))
@@ -65,6 +60,8 @@ router.post('/register',ValidateUser, async (req, res, next) => {
     email,
     password: hashedPassword,
     activationToken,
+    firstName,
+    lastName,
   })
 
   await newUser.save()
@@ -77,12 +74,12 @@ router.post('/register',ValidateUser, async (req, res, next) => {
 
 
 
-router.get('/:userId/page/:page', (req, res) => {
-  res.json({
-    msg: 'done',
-    user: req.user,
-  })
-})
+// router.get('/:userId/page/:page', (req, res) => {
+//   res.json({
+//     msg: 'done',
+//     user: req.user,
+//   })
+// })
 
 router.get('/', async (_, res) => {
   const users = await User.find()
