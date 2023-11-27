@@ -20,7 +20,7 @@ router.post('/', validateOrder, async (req, res, next) => {
   try {
     const { firstName, userId, purchasedAt, products } = req.body
 
-    if (!firstName ||!products || !userId || !purchasedAt ) {
+    if (!firstName || !products || !userId || !purchasedAt) {
       throw ApiError.badRequest('All fields are required')
     }
 
@@ -38,8 +38,6 @@ router.post('/', validateOrder, async (req, res, next) => {
       purchasedAt,
       products,
     })
-
-    console.log('orderId:', order._id)
 
     await order.save()
 
