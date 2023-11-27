@@ -3,12 +3,13 @@ import Order from '../models/order'
 import ApiError from '../errors/ApiError'
 import mongoose from 'mongoose'
 import { validateOrder } from '../middlewares/validations'
+import OrderItems from '../models/orderItems'
 
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
   try {
-    const orders = await Order.find().populate('products.product').populate('userId')
+    const orders = await Order.find().populate('orderItems').populate('userId').sort('purchasedAt')
     res.json(orders)
   } catch (error) {
     console.error(error)
@@ -16,32 +17,75 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.post('/', validateOrder, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    const { firstName, userId, purchasedAt, products } = req.body
+    const orderItemsId = Promise.all(
+      req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
+        let newOrderItem = new OrderItems({
+          quantity: orderItem.quantity,
+          product: orderItem.product,
+        })
+        newOrderItem = await newOrderItem.save()
+        return newOrderItem._id
+      })
+    )
 
-    if (!firstName || !products || !userId || !purchasedAt) {
-      throw ApiError.badRequest('All fields are required')
-    }
+    const orderIds = await orderItemsId
+    const totalPrices = await Promise.all(
+      orderIds.map(async (orderItemId) => {
+        const orderItem = await OrderItems.findById(orderItemId).populate('product', 'price')
+        if (orderItem && orderItem.product) {
+          // @ts-ignore
+          const totalPrice = orderItem.product.price * orderItem.quantity
+          return totalPrice
+        }
+        return 0
+      })
+    )
+    console.log(totalPrices)
+    const totalPrice = totalPrices.reduce((a, b) => a + b, 0)
 
-    // Ensure that products array contains valid ObjectId values
-    const validProductIds = products.map((product: { product: any }) => product.product)
-    const areValidProductIds = validProductIds.every(mongoose.Types.ObjectId.isValid)
-
-    if (!areValidProductIds) {
-      throw ApiError.badRequest('Invalid product ObjectId in the products array')
-    }
+    console.log(orderIds, 'error is here')
+    const { firstName, userId, purchasedAt, status, total } = req.body
 
     const order = new Order({
       firstName,
       userId,
       purchasedAt,
-      products,
+      orderItems: orderIds,
+      status,
+      total: totalPrice,
     })
 
     await order.save()
 
     res.json(order)
+  } catch (error) {
+    console.error(error)
+    next(ApiError.internal('Something went wrong.'))
+  }
+})
+router.put('/:id', async (req, res) => {
+  const id = req.params.id
+  const order = await Order.findByIdAndUpdate(id, { status: req.body.status })
+
+  if (!order) return res.status(400).send('cannot be created')
+  res.send(order)
+})
+router.delete('/:id', async (req, res, next) => {
+  const { id } = req.params
+
+  try {
+    Order.findByIdAndDelete(id).then(async (order) => {
+      if (order) {
+        await order.orderItems.map(async (orderItem) => {
+          await OrderItems.findByIdAndDelete(orderItem)
+        })
+        return res.status(200).json({ success: true, message: 'the order is deleted!' })
+      } else {
+        return res.status(404).json({ success: false, message: 'order not found!' })
+      }
+    })
   } catch (error) {
     console.error(error)
     next(ApiError.internal('Something went wrong.'))
