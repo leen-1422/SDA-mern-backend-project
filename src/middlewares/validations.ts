@@ -42,3 +42,52 @@ export function ValidateProducts(req: Request, res: Response, next: NextFunction
     next(ApiError.internal('somthing went wrong'))
   }
 }
+export function validateOrder(req: Request, res: Response, next: NextFunction) {
+  const schema = zod.object({
+    firstName: zod.string()
+    .min(7, { message: "Name must have at least 7 characters" })
+    .max(20, { message: "Name can have at most 20 characters" }),
+    userId: zod.string(),
+    purchasedAt: zod.string(),
+    quantity: zod.number()
+    .int().min(1, { message: "Quantity must be at least 1" }), 
+    products: zod.array(
+      zod.object({
+        product: zod.string(),
+        quantity: zod.number()
+    .int().min(1, { message: "Quantity must be at least 1" }), 
+      })
+    ),
+  });
+
+  try {
+    schema.parse(req.body);
+    next();
+  } catch (error) {
+    const err = error;
+    if (err instanceof ZodError) {
+      next(ApiError.badValidationRequest(err.errors));
+    } else {
+      next(ApiError.internal("something went wrong"));
+    }
+  }
+}
+export function validateCategory(req: Request, res: Response, next: NextFunction) {
+  const schema = zod.object({
+    name: zod.string().
+    min(7, { message: "Name must have at least 7 characters" }).
+    max(40, { message: "Name can have at most 40 characters" }),
+  });
+
+  try {
+    schema.parse(req.body);
+    next();
+  } catch (error) {
+    const err = error;
+    if (err instanceof ZodError) {
+      next(ApiError.badValidationRequest(err.errors));
+    } else {
+      next(ApiError.internal("something went wrong"));
+    }
+  }
+}

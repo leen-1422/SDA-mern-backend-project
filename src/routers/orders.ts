@@ -2,7 +2,7 @@ import express from 'express'
 import Order from '../models/order'
 import ApiError from '../errors/ApiError'
 import mongoose from 'mongoose'
-import { validateOrder } from '../middlewares/validateOrder'
+import { validateOrder } from '../middlewares/validations'
 
 const router = express.Router()
 

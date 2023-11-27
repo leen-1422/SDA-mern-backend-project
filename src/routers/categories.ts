@@ -1,7 +1,7 @@
 import express from 'express';
 import Category from '../models/category';
 import ApiError from '../errors/ApiError';
-import { validateCategory } from '../middlewares/validateCategory';
+import { validateCategory } from '../middlewares/validations'
 
 const router = express.Router();
 
