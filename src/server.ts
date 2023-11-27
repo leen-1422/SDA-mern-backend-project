@@ -23,7 +23,7 @@ import productsRouter from './routers/products';
 import ordersRouter from './routers/orders';
 import categoryRouter from './routers/categories';
 
-app.use('/api/users', usersRouter);
+app.use('/api/users', usersRouter,);
 app.use('/api/orders', ordersRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/categories', categoryRouter);

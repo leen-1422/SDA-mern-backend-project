@@ -3,13 +3,15 @@ import { NextFunction, Request, Response } from 'express'
 import zod, { ZodError } from 'zod'
 import ApiError from '../errors/ApiError'
 
-export function ValidateUser(req: Request, res: Response, next: NextFunction) {
+
+export function validateUser(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
     email: zod.string().email(),
     password: zod.string().min(6),
   })
   try {
-    Schema.parse(req.body)
+    const vaildatedUser = Schema.parse(req.body)
+    req.validateUser= vaildatedUser
     next()
   } catch (error) {
     const err = error

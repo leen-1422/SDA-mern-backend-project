@@ -4,6 +4,7 @@ import ApiError from '../errors/ApiError'
 import Product from '../models/product'
 import mongoose from 'mongoose'
 import { ValidateProducts } from '../middlewares/validations'
+import { checkAuth } from '../middlewares/checkAuth'
 const ObjectId = mongoose.Types.ObjectId
 
 //final
@@ -27,7 +28,6 @@ router.get('/', async (req, res) => {
   if (category && typeof category === 'string') {
     searchQuery.category = category
   }
-
 
   let sortOption = {}
   if (sortBy) {
@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
 })
 
 // create a new product
-router.post('/',ValidateProducts, async (req, res, next) => {
+router.post('/', ValidateProducts,checkAuth('ADMIN'), async (req, res, next) => {
   const { name, description, image, price, sizes, quantity, category } = req.body
 
   console.log(category)

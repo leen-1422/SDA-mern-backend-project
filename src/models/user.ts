@@ -1,8 +1,10 @@
 import mongoose from 'mongoose'
 import { boolean } from 'zod'
-export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
+function validateRole(role: string) {
+  if (role === 'USER' || role === 'ADMIN') {
+    return true
+  }
+  return false
 }
 
 const userSchema = new mongoose.Schema({
@@ -23,12 +25,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // role: {
-  //   type: String,
-  //   enum: Role,
-  //   default: Role.USER,
-  //   required: true,
-  // },
   isActive:{
     type: Boolean,
     default: false
@@ -37,9 +33,13 @@ const userSchema = new mongoose.Schema({
     type:String
 
   },
+  role: {
+    type: String,
+    default: 'USER',
+    validate: [validateRole, 'Role has to be either USER or ADMIN'],
+  },
 
   // relation between order and user should be many orders to one user
-  // here's 1to1 just for the demo
   order: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
