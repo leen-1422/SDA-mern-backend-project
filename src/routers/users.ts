@@ -110,7 +110,8 @@ router.get('/activateUser/:activationToken', async (req, res, next) => {
     msg: 'Account activated successfully',
   })
 })
-
+ 
+router
 // POST => login
 router.post('/login', validateUser, async (req, res, next) => {
   const { email , password } = req.validateUser
