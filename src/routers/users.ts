@@ -6,20 +6,15 @@ import 'dotenv/config'
 import nodemailer from 'nodemailer'
 import 'dotenv/config'
 
-
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
 import { validateLoginUser, validateUser } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
-import { parse } from 'dotenv';
-
+import { parse } from 'dotenv'
 
 const router = express.Router()
 
-
-
-
-router.delete('/:userId',checkAuth('ADMIN'), async (req, res, next) => {
+router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const { userId } = req.params
     const user = await User.findByIdAndDelete(userId)
@@ -53,10 +48,10 @@ function generateActivationToken() {
 }
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  auth:{
+  auth: {
     user: process.env.MAILER_USER,
-    pass: process.env.MAILER_PASS
-  }
+    pass: process.env.MAILER_PASS,
+  },
 })
 async function sendActivationEmail(userEmail:string , activationToken:string){
   const activationLink = `${process.env.MAILER_ACTIVATION_DOMAIN}/api/users/activateUser/${activationToken}`
@@ -64,12 +59,12 @@ async function sendActivationEmail(userEmail:string , activationToken:string){
 
   const mailOptions = {
     from: process.env.MAILER_USER,
-    to : userEmail,
+    to: userEmail,
     subject: 'Account Activation',
     html: `<p>hello,</p> <p>Click <a href="${activationLink}">here</a>to activate your account</p>`,
   }
   const info = await transporter.sendMail(mailOptions)
-  console.log("info", info)
+  console.log('info', info)
 }
 
 router.post('/register', validateUser, async (req, res, next) => {
@@ -100,59 +95,60 @@ router.post('/register', validateUser, async (req, res, next) => {
   })
 })
 // we recive activation token as a params
-router.get('/activateUser/:activationToken', async(req, res, next)=>{
+router.get('/activateUser/:activationToken', async (req, res, next) => {
   const activationToken = req.params.activationToken
-  const user = await User.findOne({ activationToken }) 
-  if(!user){
-    next(ApiError.badRequest(" Invalid activation token "))
-    return 
+  const user = await User.findOne({ activationToken })
+  if (!user) {
+    next(ApiError.badRequest(' Invalid activation token '))
+    return
   }
 
-  //update the values 
+  //update the values
   user.isActive = true
   user.activationToken = undefined
 
   await user.save()
 
   res.status(200).json({
-    msg: "Account activated successfully",
+    msg: 'Account activated successfully',
   })
-
 })
 
 // POST => login
 router.post('/login', validateLoginUser, async (req, res, next) => {
   const { email , password } = req.validatedLoginUser
   try {
-    const user = await User.findOne({ email}).exec();
-  
-      if (!user) {
+    const user = await User.findOne({ email }).exec()
+
+    if (!user) {
+      return res.status(401).json({
+        msg: 'Auth failed',
+      })
+    }
+    // to compare hash password with the login passowrd
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
         return res.status(401).json({
           msg: 'Auth failed',
-        });
+        })
       }
-      // to compare hash password with the login passowrd
-      bcrypt.compare(password, user.password, (err,result)=>{
-        if (err){
-          return res.status(401).json({
-            msg: 'Auth failed',
-          });
-        }
-        if (result){
-          const token = jwt.sign({
+      if (result) {
+        const token = jwt.sign(
+          {
             email: user.email,
             userId : user._id,
             role: user.role,
           }, 
           process.env.TOKEN_SECRET as string,
           {
-            expiresIn: '24h'
-          })
-          return res.status(200).json({
-            msg:'Auth successfull',
-            token: token
-          })
-        }else{
+            expiresIn: '24h',
+          }
+        )
+        return res.status(200).json({
+          msg: 'Auth successfull',
+          token: token,
+        })
+      } else {
         return res.status(401).json({
           msg: 'Auth failed',
         });
