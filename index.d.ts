@@ -4,6 +4,8 @@ declare namespace Express {
     validateUser: {
     email: string
     password: string
+    firstName:string
+    lastName:string
   }
   decodedUser: {
     userId: string
@@ -11,5 +13,11 @@ declare namespace Express {
     role: 'USER' | 'ADMIN'
     iat: number
     exp: number
-  }}
+  }
+  validatedLoginUser:{
+    email:string,
+    password:string
+  }
+
+}
 }
