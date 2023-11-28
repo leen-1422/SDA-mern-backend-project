@@ -113,50 +113,47 @@ router.get('/activateUser/:activationToken', async (req, res, next) => {
 
 // POST => login
 router.post('/login', validateUser, async (req, res, next) => {
-  const { email, password } = req.validateUser
+  const { email , password } = req.validateUser
   try {
-    const user = await User.findOne({ email }).exec()
-
-    if (!user) {
-      return res.status(401).json({
-        msg: 'Auth failed',
-      })
-    }
-    // to compare hash password with the login passowrd
-    bcrypt.compare(password, user.password, (err, result) => {
-      if (err) {
+    const user = await User.findOne({ email}).exec();
+  
+      if (!user) {
         return res.status(401).json({
           msg: 'Auth failed',
-        })
+        });
       }
-      if (result) {
-        const token = jwt.sign(
-          {
+      // to compare hash password with the login passowrd
+      bcrypt.compare(password, user.password, (err,result)=>{
+        if (err){
+          return res.status(401).json({
+            msg: 'Auth failed',
+          });
+        }
+        if (result){
+          const token = jwt.sign({
             email: user.email,
-            userId: user._id,
-          },
+            userId : user._id,
+          }, 
           process.env.TOKEN_SECRET as string,
           {
-            expiresIn: '24h',
-          }
-        )
-        return res.status(200).json({
-          msg: 'Auth successfull',
-          token: token,
-        })
-      } else {
+            expiresIn: '24h'
+          })
+          return res.status(200).json({
+            msg:'Auth successfull',
+            token: token
+          })
+        }else{
         return res.status(401).json({
           msg: 'Auth failed',
-        })
-      }
-    })
-  } catch (error) {
-    console.log('Error in login', error)
-    return res.status(500).json({
-      message: 'Cannot find user',
-    })
-  }
-})
+        });
+  }});
+    } catch (error) {
+      console.log('Error in login', error);
+      return res.status(500).json({
+        message: 'Cannot find user',
+      });
+    }
+  });
 
 // router.get('/:userId/page/:page', (req, res) => {
 //   res.json({
