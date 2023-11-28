@@ -5,12 +5,11 @@ import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import nodemailer from 'nodemailer'
 import 'dotenv/config'
-
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
 import { validateUser } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
-import { parse } from 'dotenv'
+
 
 const router = express.Router()
 
@@ -172,12 +171,12 @@ router.get('/', async (_, res) => {
     users,
   })
 })
-router.get('/', checkAuth('USER'), async (req, res, next) => {
-  const users = await User.find()
-  res.json({
-    users,
-  })
-})
+// router.get('/', checkAuth('USER'), async (req, res, next) => {
+//   const users = await User.find()
+//   res.json({
+//     users,
+//   })
+// })
 export default router
 
 // const users = [

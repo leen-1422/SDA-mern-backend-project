@@ -8,12 +8,13 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
     email: zod.string().email(),
     password: zod.string().min(6),
-    lastName: zod.string()
-    .min(5, { message: "Name must have at least 5 characters" })
-    .max(20, { message: "Name can have at most 30 characters" }),
-    firstName: zod.string()
-    .min(5, { message: "Name must have at least 5 characters" })
-    .max(20, { message: "Name can have at most 30 characters" }),  })
+    // lastName: zod.string()
+    // .min(3, { message: "Name must have at least 3 characters" })
+    // .max(20, { message: "Name can have at most 30 characters" }),
+    // firstName: zod.string()
+    // .min(3, { message: "Name must have at least 3 characters" })
+    // .max(20, { message: "Name can have at most 30 characters" }),  
+  })
   try {
     const vaildatedUser = Schema.parse(req.body)
     req.validateUser= vaildatedUser
