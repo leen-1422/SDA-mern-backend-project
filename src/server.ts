@@ -5,11 +5,13 @@ import cors from 'cors'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
 
-dotenv.config()
+
+dotenv.config();
 
 const app = express()
 const PORT = process.env.PORT || 5050
 const URL = process.env.ATLAS_URL as string
+
 
 // Middleware
 app.use(myLogger)

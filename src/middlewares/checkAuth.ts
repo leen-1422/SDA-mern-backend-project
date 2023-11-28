@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 import ApiError from '../errors/ApiError'
-
 import { DecodedUser, Role } from '../types'
 
 export function checkAuth(expectedRole: Role) {
@@ -20,10 +19,9 @@ export function checkAuth(expectedRole: Role) {
         next()
       } catch (error) {
         next(ApiError.forbidden('invalid token'))
-
-        return
       }
-      next(ApiError.forbidden('Token is required'))
+      return
     }
+    next(ApiError.forbidden('Token is required'))
   }
 }
