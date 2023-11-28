@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer'
 import 'dotenv/config'
 import ApiError from '../errors/ApiError'
 import User from '../models/user'
-import { validateUser } from '../middlewares/validations'
+import { validateLoginUser, validateUser } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
 
 
@@ -52,8 +52,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAILER_PASS,
   },
 })
-async function sendActivationEmail(userEmail: string, activationToken: string) {
-  const activationLink = `${process.env.MAILER_ACTIVATION_DOMAIN}api/users/activateUser${activationToken}`
+async function sendActivationEmail(userEmail:string , activationToken:string){
+  const activationLink = `${process.env.MAILER_ACTIVATION_DOMAIN}/api/users/activateUser/${activationToken}`
   console.log('activationLink', activationLink)
 
   const mailOptions = {
@@ -67,7 +67,7 @@ async function sendActivationEmail(userEmail: string, activationToken: string) {
 }
 
 router.post('/register', validateUser, async (req, res, next) => {
-  const { email, password } = req.validateUser
+  const { email, password , firstName , lastName  } = req.validateUser
   const userExists = await User.findOne({ email })
   if (userExists) {
     return next(ApiError.badRequest('Email already registered'))
@@ -79,6 +79,8 @@ router.post('/register', validateUser, async (req, res, next) => {
 
   const newUser = new User({
     email,
+    firstName , 
+    lastName,
     password: hashedPassword,
     activationToken,
   })
@@ -113,8 +115,8 @@ router.get('/activateUser/:activationToken', async (req, res, next) => {
  
 router
 // POST => login
-router.post('/login', validateUser, async (req, res, next) => {
-  const { email , password } = req.validateUser
+router.post('/login', validateLoginUser, async (req, res, next) => {
+  const { email , password } = req.validatedLoginUser
   try {
     const user = await User.findOne({ email}).exec();
   
@@ -134,6 +136,7 @@ router.post('/login', validateUser, async (req, res, next) => {
           const token = jwt.sign({
             email: user.email,
             userId : user._id,
+            role: user.role,
           }, 
           process.env.TOKEN_SECRET as string,
           {
@@ -154,6 +157,7 @@ router.post('/login', validateUser, async (req, res, next) => {
         message: 'Cannot find user',
       });
     }
+   
   });
 
 // router.get('/:userId/page/:page', (req, res) => {
@@ -163,29 +167,12 @@ router.post('/login', validateUser, async (req, res, next) => {
 //   })
 // })
 
-router.get('/', async (_, res) => {
-  const users = await User.find().populate('order')
+
+router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
+  const users = await User.find()
   res.json({
     users,
   })
 })
-// router.get('/', checkAuth('USER'), async (req, res, next) => {
-//   const users = await User.find()
-//   res.json({
-//     users,
-//   })
-// })
 export default router
 
-// const users = [
-//   { id: 'e539c0be-b51c-4462-8162-55cf584d9589', first_name: 'ksoutherton0' },
-//   { id: '18db4fe3-a4b5-4720-af13-f98f00f22cc2', first_name: 'kmackowle1' },
-//   { id: 'f03070b4-a084-4f94-b19e-40df0d6907c7', first_name: 'osmorthit2' },
-//   { id: '6ac16842-a7ca-4942-b33d-6ec9407dac86', first_name: 'mlongland3' },
-//   { id: '0d1491be-8415-4831-9566-742773751967', first_name: 'sgingles4' },
-//   { id: 'fd4c2e80-4d14-48f9-8116-0a83617c45e3', first_name: 'msayward5' },
-//   { id: '411cb4a0-63a2-48ec-924c-1008940b65b4', first_name: 'zedmons6' },
-//   { id: '1e9a180e-2573-49ce-8a38-6692cb3948c2', first_name: 'kaymes7' },
-//   { id: '1e1eaa42-d50d-48b3-a516-7df28e3eb605', first_name: 'jboyse8' },
-//   { id: '9250cfcd-9789-418d-9826-2536d6d6ad39', first_name: 'jnockolds9' },
-// ]

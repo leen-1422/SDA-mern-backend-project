@@ -33,11 +33,11 @@ In addition to the basic requirements, the application enhances its functionalit
 If you have a higher skill level and finish the previous requirements before the deadline, you can tackle the following bonus tasks:
 
 1. Implement search functionality to allow users to search for specific items or products based on keywords or specific fields (e.g., by title, by author). ✅
-2. Integrate JWT authentication and authorization mechanisms to secure the API endpoints and restrict access to certain routes or operations.
-3. Add functionality to handle related resources (e.g., for a library, add routes to handle borrowing or returning books; for an e-commerce store, add routes for placing an order).
+2. Integrate JWT authentication and authorization mechanisms to secure the API endpoints and restrict access to certain routes or operations.✅
+3. Add functionality to handle related resources (e.g., for a library, add routes to handle borrowing or returning books; for an e-commerce store, add routes for placing an order).✅
 
 4. Peer Review:
-   - Review the code and implementation of 2 assignments from other participants.
+   - Review the code and implementation of 2 assignments from other participants.✅
    - Provide constructive feedback and suggestions for improvement.
 
 `Please note that the bonus requirements and reviews are optional and can be completed if you have additional time and advanced skills.`
