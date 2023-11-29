@@ -17,7 +17,6 @@ router.get('/', checkAuth('ADMIN'), async (req, res) => {
     })
   }
 })
-
 // GET Category by ID
 router.get('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
   try {

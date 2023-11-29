@@ -59,7 +59,6 @@ router.post('/',checkAuth('USER'), async (req, res, next) => {
     })
 
     await order.save()
-
     res.json(order)
   } catch (error) {
     console.error(error)
@@ -91,6 +90,21 @@ router.delete('/:id', async (req, res, next) => {
   } catch (error) {
     console.error(error)
     next(ApiError.internal('Something went wrong.'))
+  }
+})
+router.get('/:orderId', async (req, res) => {
+  try {
+    const orderId = req.params.orderId
+    const order = await Order.findById(orderId)
+    if (!order) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+    res.status(200).json(order)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({
+      error: 'Internal Server Error',
+    })
   }
 })
 

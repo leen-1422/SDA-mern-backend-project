@@ -92,7 +92,7 @@ router.get('/:userId', async (req, res) => {
 })
 
 // POST => login
-router.post('/login', validateLoginUser, async (req, res, next) => {
+router.post('/login', validateLoginUser, async (req, res) => {
   const { email, password } = req.validatedLoginUser
   try {
     const user = await User.findOne({ email }).exec()

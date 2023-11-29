@@ -53,7 +53,7 @@ export function validateLoginUser(req: Request, res: Response, next: NextFunctio
 }
 export function validateProducts(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
-    name: zod.string().min(1).max(255),
+    name: zod.string().min(1).max(40),
     image: zod.string().url(),
     category: zod.string(),
     description: zod.string(),
