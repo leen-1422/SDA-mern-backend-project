@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 //create an order
-router.post('/', validateOrder, async (req, res, next) => {
+router.post('/', validateOrder, checkAuth('USER'), async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
