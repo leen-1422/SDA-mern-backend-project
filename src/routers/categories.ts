@@ -31,7 +31,7 @@ router.get('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
 })
 
 // CREATE a Category
-router.post('/', validateCategory, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/create', validateCategory, checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const name = req.body.name
     if (!name) {

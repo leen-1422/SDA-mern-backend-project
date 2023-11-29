@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 //create an order
-router.post('/',checkAuth('USER'), async (req, res, next) => {
+router.post('/',  validateOrder, async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -47,15 +47,19 @@ router.post('/',checkAuth('USER'), async (req, res, next) => {
     const totalPrice = totalPrices.reduce((a, b) => a + b, 0)
 
     console.log(orderIds, 'error is here')
-    const { firstName, userId, purchasedAt, status, total } = req.body
+    const { userId, purchasedAt, status, total, shippingAddress, city, zipCode, country, phone } = req.body
 
     const order = new Order({
-      firstName,
       userId,
       purchasedAt,
       orderItems: orderIds,
       status,
       total: totalPrice,
+      shippingAddress,
+      city,
+      zipCode,
+      country,
+      phone,
     })
 
     await order.save()
@@ -66,7 +70,7 @@ router.post('/',checkAuth('USER'), async (req, res, next) => {
   }
 })
 //update order
-router.put('/:id',checkAuth('ADMIN'), async (req, res) => {
+router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
   const id = req.params.id
   const order = await Order.findByIdAndUpdate(id, { status: req.body.status })
 

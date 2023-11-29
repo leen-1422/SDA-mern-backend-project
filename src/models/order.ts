@@ -1,4 +1,5 @@
 import mongoose, { Document } from 'mongoose'
+import { string } from 'zod'
 
 export type OrderDocument = Document & {
   name: string
@@ -6,10 +7,6 @@ export type OrderDocument = Document & {
 }
 
 const orderSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
@@ -19,12 +16,34 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
   orderItems: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'OrderItems',
     },
   ],
+  shippingAddress: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  zipCode: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+
   status: {
     type: String,
     default: 'pending',

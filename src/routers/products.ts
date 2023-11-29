@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
 })
 
 // create a new product
-router.post('/', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/create', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
   const { name, description, image, price, sizes, quantity, category } = req.body
 
   console.log(category)
@@ -128,7 +128,7 @@ router.put('/:id', checkAuth('ADMIN'),async (req, res, next) => {
 
 // get a single product by id
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkAuth('ADMIN'), async (req, res, next) => {
   const { id } = req.params
 
   // Validate if id is a valid ObjectId
