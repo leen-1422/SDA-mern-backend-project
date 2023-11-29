@@ -12,7 +12,6 @@ import { checkAuth } from '../middlewares/checkAuth'
 
 
 const router = express.Router()
-
 router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const { userId } = req.params
@@ -25,7 +24,7 @@ router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
     res.status(500).json({ message: 'error ' })
   }
 })
-router.put('/:id', async (req, res) => {
+router.put('/:id',checkAuth('USER'), async (req, res) => {
   try {
     const { id } = req.params
     const user = await User.findByIdAndUpdate(id, req.body)
@@ -101,19 +100,14 @@ router.get('/activateUser/:activationToken', async (req, res, next) => {
     next(ApiError.badRequest(' Invalid activation token '))
     return
   }
-
   //update the values
   user.isActive = true
   user.activationToken = undefined
-
   await user.save()
-
   res.status(200).json({
     msg: 'Account activated successfully',
   })
 })
- 
-router
 // POST => login
 router.post('/login', validateLoginUser, async (req, res, next) => {
   const { email , password } = req.validatedLoginUser
@@ -157,16 +151,80 @@ router.post('/login', validateLoginUser, async (req, res, next) => {
         message: 'Cannot find user',
       });
     }
-   
   });
-
-// router.get('/:userId/page/:page', (req, res) => {
-//   res.json({
-//     msg: 'done',
-//     // user: req.user,
-//   })
-// })
-
+  router.put('/profile/:userId', checkAuth('ADMIN'), async (req, res) => {
+    try {
+      const { firstName, lastName } = req.body;
+      const userId = req.params.userId;
+      if (!firstName || !lastName) {
+        return res.status(400).json({
+          message: 'Both firstName and lastName are required for the update',
+        });
+      }
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { firstName, lastName },
+        { new: true }
+      );
+      if (!updatedUser) {
+        return res.status(404).json({
+          message: `Cannot find user with userId: ${userId}`,
+        });
+      }
+      res.status(200).json({
+        message: 'User profile updated successfully',
+        user: updatedUser,
+      });
+    } catch (error: any) {
+      console.error('Error with updating user profile', error);
+      res.status(500).json({
+        message: 'Internal server error',
+      });
+    }
+  });
+  
+  router.put('/block/:userId', checkAuth('ADMIN'), async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          message: `Cannot find user with userId: ${userId}`,
+        });
+      }
+        user.blocked = true;
+      const blockedUser = await user.save();
+      res.status(200).json({
+        message: 'User blocked successfully',
+        user: blockedUser,
+      });
+    } catch (error) {
+      console.error('Error with blocking user', error);
+      res.status(500).json({
+        message: 'Internal server error',
+      });
+    }
+  });
+  
+  
+//  Get user by ID
+  router.get('/:userId', checkAuth('ADMIN'), async (req, res) => {
+    try {
+      const userId = req.params.userId; 
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: 'Internal Server Error',
+      });
+    }
+  });
+  
+  
 
 router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
   const users = await User.find()

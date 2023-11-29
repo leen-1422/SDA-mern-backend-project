@@ -7,7 +7,7 @@ import { checkAuth } from '../middlewares/checkAuth'
 const router = express.Router()
 
 // GET All Categories
-router.get('/',checkAuth('USER') ,async (req, res) => {
+router.get('/',checkAuth('ADMIN') ,async (req, res) => {
   try {
     const categories = await Category.find()
     res.status(200).json(categories)
@@ -19,7 +19,7 @@ router.get('/',checkAuth('USER') ,async (req, res) => {
 })
 
 // GET Category by ID
-router.get('/:categoryId', checkAuth('USER') ,async (req, res) => {
+router.get('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
   try {
     const categoryId = req.params.categoryId
     const category = await Category.findById(categoryId)
