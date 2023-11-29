@@ -13,7 +13,8 @@ const router = express.Router()
 
 //get list of users by admin
 router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
-  const users = await User.find().populate('orderId')
+  const users = await User.find()
+  // .populate('orderId')
   res.json({
     users,
   })
@@ -190,14 +191,21 @@ async function sendActivationEmail(userEmail: string, activationToken: string) {
     from: process.env.MAILER_USER,
     to: userEmail,
     subject: 'Account Activation',
-    html: `<p>hello,</p> <p>Click <a href="${activationLink}">here</a>to activate your account</p>`,
+    html: `<div style="background-color: #f2f2f2; padding: 20px;">
+    <h2 style="color: #333;">Account Activation</h2>
+    <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">Hello </p>
+    <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">
+      Click the button below to activate your account:
+    </p>
+    <a href="${activationLink}" style="display: inline-block; background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 16px; font-size: 16px; border-radius: 4px;">Activate Account</a>
+  </div>`,
   }
   const info = await transporter.sendMail(mailOptions)
   console.log('info', info)
 }
 //register an user
 router.post('/register', validateUser, async (req, res, next) => {
-  const { email, password, firstName, lastName ,orderId } = req.validateUser
+  const { email, password, firstName, lastName } = req.validateUser
   const userExists = await User.findOne({ email })
   if (userExists) {
     return next(ApiError.badRequest('Email already registered'))
@@ -213,8 +221,6 @@ router.post('/register', validateUser, async (req, res, next) => {
     lastName,
     password: hashedPassword,
     activationToken,
-    orderId
-
   })
 
   await newUser.save()

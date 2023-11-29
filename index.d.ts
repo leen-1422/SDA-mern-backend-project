@@ -5,7 +5,7 @@ declare namespace Express {
       password: string
       firstName: string
       lastName: string
-      orderId:string
+      // orderId:string
     }
     decodedUser: {
       userId: string
