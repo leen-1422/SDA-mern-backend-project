@@ -4,9 +4,10 @@ import ApiError from '../errors/ApiError'
 import mongoose from 'mongoose'
 import { validateOrder } from '../middlewares/validations'
 import OrderItems from '../models/orderItems'
+import { checkAuth } from '../middlewares/checkAuth'
 
 const router = express.Router()
-
+// get all orders
 router.get('/', async (req, res, next) => {
   try {
     const orders = await Order.find().populate('orderItems').populate('userId').sort('purchasedAt')
@@ -16,8 +17,8 @@ router.get('/', async (req, res, next) => {
     next(ApiError.internal('Something went wrong.'))
   }
 })
-
-router.post('/', async (req, res, next) => {
+//create an order
+router.post('/',checkAuth('USER'), async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -65,7 +66,8 @@ router.post('/', async (req, res, next) => {
     next(ApiError.internal('Something went wrong.'))
   }
 })
-router.put('/:id', async (req, res) => {
+//update order
+router.put('/:id',checkAuth('ADMIN'), async (req, res) => {
   const id = req.params.id
   const order = await Order.findByIdAndUpdate(id, { status: req.body.status })
 
