@@ -8,10 +8,15 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
     email: zod.string().email(),
     password: zod.string().min(6),
-    firstName:zod.string(),
-    lastName:zod.string(),
+    lastName: zod.string()
+    .min(3, { message: "Name must have at least 3 characters" })
+    .max(20, { message: "Name can have at most 30 characters" }),
+    firstName: zod.string()
+    .min(3, { message: "Name must have at least 3 characters" })
+    .max(20, { message: "Name can have at most 30 characters" }),  
     role:zod.string()
   })
+ 
   try {
     const vaildatedUser = Schema.parse(req.body)
     req.validateUser= vaildatedUser
@@ -69,7 +74,7 @@ export function ValidateProducts(req: Request, res: Response, next: NextFunction
 export function validateOrder(req: Request, res: Response, next: NextFunction) {
   const schema = zod.object({
     firstName: zod.string()
-    .min(7, { message: "Name must have at least 7 characters" })
+    .min(3, { message: "Name must have at least 3 characters" })
     .max(20, { message: "Name can have at most 20 characters" }),
     userId: zod.string(),
     purchasedAt: zod.string(),
