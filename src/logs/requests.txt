@@ -1153,3 +1153,4 @@ Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 9:45:14 PM
 Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 9:46:05 PM
 Method: POST, Path: /api/users/login, Date: 11/29/2023, Time: 9:48:40 PM
 Method: GET, Path: /api/users, Date: 11/29/2023, Time: 9:49:07 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:56:12 PM
