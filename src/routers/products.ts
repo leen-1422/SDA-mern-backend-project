@@ -7,7 +7,7 @@ import { validateProducts } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
 const ObjectId = mongoose.Types.ObjectId
 
-//get list of products 
+//get list of products
 router.get('/', async (req, res) => {
   const page = Number(req.query.page)
   const limit = Number(req.query.limit)
@@ -95,7 +95,7 @@ router.post('/', validateProducts, checkAuth('ADMIN'), async (req, res, next) =>
 })
 
 // delete product
-router.delete('/:id',checkAuth('ADMIN'), async (req, res, next) => {
+router.delete('/:id', checkAuth('ADMIN'), async (req, res, next) => {
   const { id } = req.params
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))
@@ -111,7 +111,7 @@ router.delete('/:id',checkAuth('ADMIN'), async (req, res, next) => {
 
 // update product
 
-router.put('/:id', checkAuth('ADMIN'),async (req, res, next) => {
+router.put('/:id', checkAuth('ADMIN'), async (req, res, next) => {
   const id = req.params.id
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))

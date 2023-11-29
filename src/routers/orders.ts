@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 //create an order
-router.post('/',  validateOrder, async (req, res, next) => {
+router.post('/', validateOrder, async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -47,7 +47,8 @@ router.post('/',  validateOrder, async (req, res, next) => {
     const totalPrice = totalPrices.reduce((a, b) => a + b, 0)
 
     console.log(orderIds, 'error is here')
-    const { userId, purchasedAt, status, total, shippingAddress, city, zipCode, country, phone } = req.body
+    const { userId, purchasedAt, status, total, shippingAddress, city, zipCode, country, phone } =
+      req.body
 
     const order = new Order({
       userId,

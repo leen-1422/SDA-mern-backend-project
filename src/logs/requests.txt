@@ -1136,3 +1136,11 @@ Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 7:37:55 PM
 Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 7:38:45 PM
 Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 7:42:19 PM
 Method: POST, Path: /api/orders, Date: 11/29/2023, Time: 7:42:46 PM
+Method: POST, Path: /api/user/register, Date: 11/29/2023, Time: 8:59:06 PM
+Method: POST, Path: /api/user/register, Date: 11/29/2023, Time: 8:59:30 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 8:59:45 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:01:34 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:04:28 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:05:09 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:16:15 PM
+Method: POST, Path: /api/users/register, Date: 11/29/2023, Time: 9:16:58 PM

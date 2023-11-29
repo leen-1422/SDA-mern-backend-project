@@ -13,7 +13,8 @@ const router = express.Router()
 
 //get list of users by admin
 router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
-  const users = await User.find().populate('orderId')
+  const users = await User.find() 
+  // .populate('orderId')
   res.json({
     users,
   })
@@ -193,7 +194,7 @@ async function sendActivationEmail(userEmail: string, activationToken: string) {
 }
 //register an user
 router.post('/register', validateUser, async (req, res, next) => {
-  const { email, password, firstName, lastName ,orderId } = req.validateUser
+  const { email, password, firstName, lastName  } = req.validateUser
   const userExists = await User.findOne({ email })
   if (userExists) {
     return next(ApiError.badRequest('Email already registered'))
@@ -209,7 +210,7 @@ router.post('/register', validateUser, async (req, res, next) => {
     lastName,
     password: hashedPassword,
     activationToken,
-    orderId
+  
 
   })
 
