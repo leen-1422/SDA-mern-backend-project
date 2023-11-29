@@ -45,7 +45,7 @@ export function validateLoginUser(req: Request, res: Response, next: NextFunctio
     next(ApiError.internal('somthing went wrong'))
   }
 }
-export function ValidateProducts(req: Request, res: Response, next: NextFunction) {
+export function validateProducts(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
     name: zod.string().min(1).max(255),
     image: zod.string().url(),
