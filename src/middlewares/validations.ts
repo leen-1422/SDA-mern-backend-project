@@ -14,7 +14,8 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
     firstName: zod.string()
     .min(3, { message: "Name must have at least 3 characters" })
     .max(20, { message: "Name can have at most 30 characters" }),  
-    role:zod.string()
+    role:zod.string(),
+    orderId:zod.string()
   })
  
   try {

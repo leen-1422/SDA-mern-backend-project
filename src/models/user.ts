@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { boolean } from 'zod'
 function validateRole(role: string) {
   if (role === 'USER' || role === 'ADMIN') {
     return true
@@ -29,13 +28,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  isActive:{
+  isActive: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  activationToken :{
-    type:String
-
+  activationToken: {
+    type: String,
   },
   role: {
     type: String,
@@ -43,10 +41,10 @@ const userSchema = new mongoose.Schema({
     validate: [validateRole, 'Role has to be either USER or ADMIN'],
   },
 
-  // relation between order and user should be many orders to one user
-  order: {
+  orderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
+    required: true,
   },
 })
 

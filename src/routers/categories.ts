@@ -1,13 +1,13 @@
 import express from 'express'
-import Category from '../models/category'
 import ApiError from '../errors/ApiError'
-import { validateCategory } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
+import { validateCategory } from '../middlewares/validations'
+import Category from '../models/category'
 
 const router = express.Router()
 
-// GET All Categories
-router.get('/',checkAuth('ADMIN') ,async (req, res) => {
+// GET All Categories by an admin
+router.get('/', checkAuth('ADMIN'), async (req, res) => {
   try {
     const categories = await Category.find()
     res.status(200).json(categories)
@@ -19,7 +19,7 @@ router.get('/',checkAuth('ADMIN') ,async (req, res) => {
 })
 
 // GET Category by ID
-router.get('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
+router.get('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
   try {
     const categoryId = req.params.categoryId
     const category = await Category.findById(categoryId)
@@ -31,8 +31,8 @@ router.get('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
   }
 })
 
-// CREATE Category
-router.post('/', validateCategory, checkAuth('ADMIN') ,async (req, res, next) => {
+// CREATE a Category
+router.post('/', validateCategory, checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const name = req.body.name
     if (!name) {
@@ -56,7 +56,7 @@ router.post('/', validateCategory, checkAuth('ADMIN') ,async (req, res, next) =>
 })
 
 // UPDATE Category
-router.put('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
+router.put('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
   const newName = req.body.name
   const categoryId = req.params.categoryId
 
@@ -74,7 +74,7 @@ router.put('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
 })
 
 // DELETE Category by ID
-router.delete('/:categoryId', checkAuth('ADMIN') ,async (req, res) => {
+router.delete('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
   try {
     const categoryId = req.params.categoryId
     await Category.deleteOne({

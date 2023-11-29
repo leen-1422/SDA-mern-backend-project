@@ -3,11 +3,11 @@ const router = express.Router()
 import ApiError from '../errors/ApiError'
 import Product from '../models/product'
 import mongoose from 'mongoose'
-import { ValidateProducts } from '../middlewares/validations'
+import { validateProducts } from '../middlewares/validations'
 import { checkAuth } from '../middlewares/checkAuth'
 const ObjectId = mongoose.Types.ObjectId
 
-//final
+//get list of products 
 router.get('/', async (req, res) => {
   const page = Number(req.query.page)
   const limit = Number(req.query.limit)
@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
 })
 
 // create a new product
-router.post('/', ValidateProducts, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
   const { name, description, image, price, sizes, quantity, category } = req.body
 
   console.log(category)
@@ -95,7 +95,7 @@ router.post('/', ValidateProducts, checkAuth('ADMIN'), async (req, res, next) =>
 })
 
 // delete product
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id',checkAuth('ADMIN'), async (req, res, next) => {
   const { id } = req.params
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))
@@ -111,7 +111,7 @@ router.delete('/:id', async (req, res, next) => {
 
 // update product
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', checkAuth('ADMIN'),async (req, res, next) => {
   const id = req.params.id
   if (!ObjectId.isValid(id)) {
     next(ApiError.badRequest('bad request'))

@@ -1,4 +1,3 @@
-
 import mongoose, { Document } from 'mongoose'
 
 export type CategoryDocument = Document & {
