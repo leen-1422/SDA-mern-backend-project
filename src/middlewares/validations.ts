@@ -52,8 +52,7 @@ export function validateLoginUser(req: Request, res: Response, next: NextFunctio
 }
 export function validateProducts(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
-    name: zod.string().min(1).max(255),
-    image: zod.string().url(),
+    name: zod.string().min(1).max(40),
     category: zod.string(),
     description: zod.string(),
     sizes: zod.array(zod.string()),
@@ -104,7 +103,7 @@ export function validateCategory(req: Request, res: Response, next: NextFunction
   const schema = zod.object({
     name: zod
       .string()
-      .min(7, { message: 'Name must have at least 7 characters' })
+      .min(3, { message: 'Name must have at least 3 characters' })
       .max(40, { message: 'Name can have at most 40 characters' }),
   })
 

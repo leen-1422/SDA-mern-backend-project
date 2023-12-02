@@ -26,7 +26,7 @@ router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
     const { userId } = req.params
     const user = await User.findByIdAndDelete(userId)
     if (!user) {
-      next(ApiError.badRequest('user id is required.'))
+      next(ApiError.badRequest('The user is deleted.'))
     }
     res.status(200).json(user)
   } catch (error) {
@@ -55,26 +55,30 @@ router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
 //block user by an admin
 router.put('/block/:userId', checkAuth('ADMIN'), async (req, res) => {
   try {
-    const userId = req.params.userId
-    const user = await User.findById(userId)
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({
         message: `Cannot find user with userId: ${userId}`,
-      })
+      });
     }
-    user.blocked = true
-    const blockedUser = await user.save()
+    user.blocked = !user.blocked;
+
+    const updatedUser = await user.save();
+
     res.status(200).json({
-      message: 'User blocked successfully',
-      user: blockedUser,
-    })
+      message: `User ${user.blocked ? 'blocked' : 'unblocked'} successfully`,
+      user: updatedUser,
+    });
   } catch (error) {
-    console.error('Error with blocking user', error)
+    console.error('Error with blocking/unblocking user', error);
     res.status(500).json({
       message: 'Internal server error',
-    })
+    });
   }
-})
+});
+
 //  Get user by ID
 router.get('/:userId', async (req, res) => {
   try {
@@ -93,7 +97,7 @@ router.get('/:userId', async (req, res) => {
 })
 
 // POST => login
-router.post('/login', validateLoginUser, async (req, res, next) => {
+router.post('/login', validateLoginUser, async (req, res) => {
   const { email, password } = req.validatedLoginUser
   try {
     const user = await User.findOne({ email }).exec()

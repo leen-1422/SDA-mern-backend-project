@@ -1,10 +1,11 @@
 import express from 'express'
-const router = express.Router()
-import ApiError from '../errors/ApiError'
-import Product from '../models/product'
 import mongoose from 'mongoose'
-import { validateProducts } from '../middlewares/validations'
+import ApiError from '../errors/ApiError'
 import { checkAuth } from '../middlewares/checkAuth'
+import upload from '../middlewares/uploadFile'
+import { validateProducts } from '../middlewares/validations'
+import Product from '../models/product'
+const router = express.Router()
 const ObjectId = mongoose.Types.ObjectId
 
 //get list of products
@@ -73,62 +74,69 @@ router.get('/', async (req, res) => {
 })
 
 // create a new product
-router.post('/', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
-  const { name, description, image, price, sizes, quantity, category } = req.body
+router.post('/create', upload.single('image'), validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
+  try {
+    const { name, description, image, price, sizes, quantity, category } = req.body;
 
-  console.log(category)
-  if (!name || !description || !image || !price || !sizes || !category) {
-    next(ApiError.badRequest('All fields are requried'))
-    return
+    if (!name || !description || !image || !price || !sizes || !category) {
+      throw ApiError.badRequest('All fields are required');
+    }
+      const product = new Product({
+      name,
+      description,
+      quantity,
+      category,
+      sizes,
+      price,
+      image: req.file?.path,
+    });
+    await product.save();
+    res.json({ success: true, message: 'Product created', data: product });
+  } catch (error) {
+    next(error);
   }
-  const product = new Product({
-    name,
-    description,
-    quantity,
-    category,
-    sizes,
-    price,
-    image,
-  })
-  await product.save()
-  res.json(product)
-})
+});
 
+// Update Product
+router.put('/:productId', checkAuth('ADMIN'), async (req, res) => {
+  const newName = req.body.name;
+  const productId = req.params.productId;
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { name: newName },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ success: false, message: `Product with ID ${productId} not found` });
+    }
+if(updatedProduct){
+    res.json({ success: true, message: 'Product updated successfully', updatedProduct });
+  }
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 // delete product
-router.delete('/:id', checkAuth('ADMIN'), async (req, res, next) => {
-  const { id } = req.params
-  if (!ObjectId.isValid(id)) {
-    next(ApiError.badRequest('bad request'))
-    return
+router.delete('/:productId', checkAuth('ADMIN'), async (req, res, next) => {
+  try {
+    const { productId } = req.params
+    const product = await Product.findByIdAndDelete(productId)
+    if (!product) {
+      next(ApiError.badRequest('Product is deleted successfully.'))
+    }
+    res.status(200).json(product)
+  } catch (error) {
+    res.status(500).json({ message: 'error ' })
   }
-  const product = await Product.findByIdAndDelete()
-  if (!product) {
-    next(ApiError.badRequest(`cannot find product with ${id}`))
-    return
-  }
-  res.json(product)
-})
-
-// update product
-
-router.put('/:id', checkAuth('ADMIN'), async (req, res, next) => {
-  const id = req.params.id
-  if (!ObjectId.isValid(id)) {
-    next(ApiError.badRequest('bad request'))
-    return
-  }
-  const product = await Product.findByIdAndUpdate(id, req.body)
-  if (!product) {
-    next(ApiError.badRequest(`cannot find product with ${id}`))
-    return
-  }
-  const updatedProduct = await Product.findById(id)
-  res.json(updatedProduct)
 })
 
 // get a single product by id
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkAuth('ADMIN'), async (req, res, next) => {
   const { id } = req.params
 
   // Validate if id is a valid ObjectId
