@@ -26,7 +26,7 @@ router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
     const { userId } = req.params
     const user = await User.findByIdAndDelete(userId)
     if (!user) {
-      next(ApiError.badRequest('user id is required.'))
+      next(ApiError.badRequest('The user is deleted.'))
     }
     res.status(200).json(user)
   } catch (error) {

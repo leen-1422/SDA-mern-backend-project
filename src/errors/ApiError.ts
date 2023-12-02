@@ -1,6 +1,7 @@
 import { ZodError } from "zod"
 
 class ApiError {
+  static NotFound: any
   constructor(public code: number, public message: string | ZodError['errors']) {
     this.code = code
     this.message = message

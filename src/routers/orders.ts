@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 //create an order
-router.post('/', validateOrder, checkAuth('USER'), async (req, res, next) => {
+router.post('/create', validateOrder, checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -70,17 +70,32 @@ router.post('/', validateOrder, checkAuth('USER'), async (req, res, next) => {
     next(ApiError.internal('Something went wrong.'))
   }
 })
-//update order
-router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
-  const id = req.params.id
-  const order = await Order.findByIdAndUpdate(id, { status: req.body.status })
+// Update Order
+router.put('/:orderId', checkAuth('ADMIN'), async (req, res) => {
+  const newStatus = req.body.status;
+  const orderId = req.params.orderId;
 
-  if (!order) return res.status(400).send('cannot be created')
-  res.send(order)
-})
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { status: newStatus },
+      { new: true }
+    );
+    if (!updatedOrder) {
+      console.error(`Order with ID ${orderId} not found`);
+      return res.status(404).json({ success: false, message: `Order with ID ${orderId} not found` });
+    }
+    console.log('Order updated successfully:', updatedOrder);
+    res.json({ success: true, message: 'Order updated successfully', updatedOrder });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+
 router.delete('/:id', async (req, res, next) => {
   const { id } = req.params
-
   try {
     Order.findByIdAndDelete(id).then(async (order) => {
       if (order) {

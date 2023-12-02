@@ -73,12 +73,15 @@ router.put('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
 })
 
 // DELETE Category by ID
-router.delete('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
+router.delete('/:categoryId', checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const categoryId = req.params.categoryId
     await Category.deleteOne({
       _id: categoryId,
     })
+    if (!categoryId){
+      next(ApiError.badRequest('Category is deleted successfully'))
+    }
     res.status(204).send()
   } catch (error) {
     res.status(500).json({

@@ -93,37 +93,41 @@ router.post('/create', validateProducts, checkAuth('ADMIN'), async (req, res, ne
   await product.save()
   res.json(product)
 })
+// Update Product
+router.put('/:productId', checkAuth('ADMIN'), async (req, res) => {
+  const newName = req.body.name;
+  const productId = req.params.productId;
 
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { name: newName },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ success: false, message: `Product with ID ${productId} not found` });
+    }
+if(updatedProduct){
+    res.json({ success: true, message: 'Product updated successfully', updatedProduct });
+  }
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 // delete product
-router.delete('/:id', checkAuth('ADMIN'), async (req, res, next) => {
-  const { id } = req.params
-  if (!ObjectId.isValid(id)) {
-    next(ApiError.badRequest('bad request'))
-    return
+router.delete('/:productId', checkAuth('ADMIN'), async (req, res, next) => {
+  try {
+    const { productId } = req.params
+    const product = await Product.findByIdAndDelete(productId)
+    if (!product) {
+      next(ApiError.badRequest('Product is deleted successfully.'))
+    }
+    res.status(200).json(product)
+  } catch (error) {
+    res.status(500).json({ message: 'error ' })
   }
-  const product = await Product.findByIdAndDelete()
-  if (!product) {
-    next(ApiError.badRequest(`cannot find product with ${id}`))
-    return
-  }
-  res.json(product)
-})
-
-// update product
-
-router.put('/:id', checkAuth('ADMIN'), async (req, res, next) => {
-  const id = req.params.id
-  if (!ObjectId.isValid(id)) {
-    next(ApiError.badRequest('bad request'))
-    return
-  }
-  const product = await Product.findByIdAndUpdate(id, req.body)
-  if (!product) {
-    next(ApiError.badRequest(`cannot find product with ${id}`))
-    return
-  }
-  const updatedProduct = await Product.findById(id)
-  res.json(updatedProduct)
 })
 
 // get a single product by id
