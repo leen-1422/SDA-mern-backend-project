@@ -1,10 +1,11 @@
 import express from 'express'
-const router = express.Router()
-import ApiError from '../errors/ApiError'
-import Product from '../models/product'
 import mongoose from 'mongoose'
-import { validateProducts } from '../middlewares/validations'
+import ApiError from '../errors/ApiError'
 import { checkAuth } from '../middlewares/checkAuth'
+import upload from '../middlewares/uploadFile'
+import { validateProducts } from '../middlewares/validations'
+import Product from '../models/product'
+const router = express.Router()
 const ObjectId = mongoose.Types.ObjectId
 
 //get list of products
@@ -73,26 +74,29 @@ router.get('/', async (req, res) => {
 })
 
 // create a new product
-router.post('/create', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
-  const { name, description, image, price, sizes, quantity, category } = req.body
+router.post('/create', upload.single('image'), validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
+  try {
+    const { name, description, image, price, sizes, quantity, category } = req.body;
 
-  console.log(category)
-  if (!name || !description || !image || !price || !sizes || !category) {
-    next(ApiError.badRequest('All fields are requried'))
-    return
+    if (!name || !description || !image || !price || !sizes || !category) {
+      throw ApiError.badRequest('All fields are required');
+    }
+      const product = new Product({
+      name,
+      description,
+      quantity,
+      category,
+      sizes,
+      price,
+      image: req.file?.path,
+    });
+    await product.save();
+    res.json({ success: true, message: 'Product created', data: product });
+  } catch (error) {
+    next(error);
   }
-  const product = new Product({
-    name,
-    description,
-    quantity,
-    category,
-    sizes,
-    price,
-    image,
-  })
-  await product.save()
-  res.json(product)
-})
+});
+
 // Update Product
 router.put('/:productId', checkAuth('ADMIN'), async (req, res) => {
   const newName = req.body.name;

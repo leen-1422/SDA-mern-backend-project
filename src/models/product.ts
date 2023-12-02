@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
+      dafault: "public/images/products/default.png",
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
