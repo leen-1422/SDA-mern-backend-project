@@ -5,16 +5,17 @@ import cors from 'cors'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
 
-
-dotenv.config();
+dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5050
 const URL = process.env.ATLAS_URL as string
 
-
 // Middleware
-app.use(myLogger)
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(myLogger)
+}
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors()) // Enable CORS
@@ -24,6 +25,12 @@ import usersRouter from './routers/users'
 import productsRouter from './routers/products'
 import ordersRouter from './routers/orders'
 import categoryRouter from './routers/categories'
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'welocome',
+  })
+})
 
 app.use('/api/users', usersRouter)
 app.use('/api/orders', ordersRouter)
@@ -49,4 +56,4 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`)
 })
 
-export default app;
+export default app
