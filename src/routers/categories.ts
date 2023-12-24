@@ -7,7 +7,7 @@ import Category from '../models/category'
 const router = express.Router()
 
 // GET All Categories by an admin
-router.get('/', checkAuth('ADMIN'), async (req, res) => {
+router.get('/',  async (req, res) => {
   try {
     const categories = await Category.find()
     res.status(200).json(categories)
@@ -18,7 +18,7 @@ router.get('/', checkAuth('ADMIN'), async (req, res) => {
   }
 })
 // GET Category by ID
-router.get('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
+router.get('/:categoryId', async (req, res) => {
   try {
     const categoryId = req.params.categoryId
     const category = await Category.findById(categoryId)
@@ -31,7 +31,7 @@ router.get('/:categoryId', checkAuth('ADMIN'), async (req, res) => {
 })
 
 // CREATE a Category
-router.post('/create', validateCategory, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/', validateCategory, checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const name = req.body.name
     if (!name) {

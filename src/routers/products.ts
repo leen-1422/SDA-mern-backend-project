@@ -10,8 +10,8 @@ const ObjectId = mongoose.Types.ObjectId
 
 //get list of products
 router.get('/', async (req, res) => {
-  const page = Number(req.query.page)
-  const limit = Number(req.query.limit)
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 4
   const startIndex = (page - 1) * limit
   const lastIndex = page * limit
   const search = req.query.search
@@ -49,7 +49,7 @@ router.get('/', async (req, res) => {
     }
   }
 
-  const result = { next: {}, previous: {}, result: [] as {} }
+  const result = { infoOfPage: {}, next: {}, previous: {}, result: [] as {} }
   const products = await Product.find(searchQuery)
     .sort(sortOption)
     .populate('category')
@@ -58,68 +58,83 @@ router.get('/', async (req, res) => {
   const filteredCount = await Product.countDocuments(searchQuery)
   const totalPages = Math.ceil(filteredCount / limit)
   result.result = products
+
+  result.infoOfPage = {
+    page: page,
+    perPage: limit,
+    totalPages: totalPages,
+    totalItems: filteredCount,
+  }
+
   if (lastIndex < totalPages) {
     result.next = {
       page: page + 1,
       limit: limit,
     }
   }
-  if (startIndex + limit < filteredCount) {
-    result.next = {
-      page: page + 1,
-      limit: limit,
-    }
-  }
+
   res.json(result)
 })
 
+//get list of products by admin
+
+router.get('/admin', checkAuth('ADMIN'), async (req, res, next) => {
+  const products = await Product.find()
+  res.json({
+    products,
+  })
+})
+
 // create a new product
-router.post('/create', upload.single('image'), validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/', validateProducts, checkAuth('ADMIN'), async (req, res, next) => {
   try {
-    const { name, description, image, price, sizes, quantity, category } = req.body;
+    const { name, description, image, price, sizes, quantity, category } = req.body
 
     if (!name || !description || !image || !price || !sizes || !category) {
-      throw ApiError.badRequest('All fields are required');
+      throw ApiError.badRequest('All fields are required')
     }
-      const product = new Product({
+    const product = new Product({
       name,
       description,
       quantity,
       category,
       sizes,
       price,
-      image: req.file?.path,
-    });
-    await product.save();
-    res.json({ success: true, message: 'Product created', data: product });
+      image,
+    })
+    await product.save()
+    res.json({ success: true, message: 'Product created', data: product })
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // Update Product
 router.put('/:productId', checkAuth('ADMIN'), async (req, res) => {
-  const newName = req.body.name;
-  const productId = req.params.productId;
+  const productId = req.params.productId
+  // const newName = req.body.name
+  const { name, description, image, price, sizes, quantity, category } = req.body
 
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
-      { name: newName },
+      { name, description, image, price, sizes, quantity, category },
       { new: true }
-    );
+    )
 
     if (!updatedProduct) {
-      return res.status(404).json({ success: false, message: `Product with ID ${productId} not found` });
+      return res
+        .status(404)
+        .json({ success: false, message: `Product with ID ${productId} not found` })
     }
-if(updatedProduct){
-    res.json({ success: true, message: 'Product updated successfully', updatedProduct });
-  }
+    if (updatedProduct) {
+      res.json({ success: true, message: 'Product updated successfully', updatedProduct })
+    }
   } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error('Error updating product:', error)
+    res.status(500).json({ success: false, message: 'Internal Server Error' })
   }
-});
+})
 // delete product
 router.delete('/:productId', checkAuth('ADMIN'), async (req, res, next) => {
   try {
@@ -136,7 +151,7 @@ router.delete('/:productId', checkAuth('ADMIN'), async (req, res, next) => {
 
 // get a single product by id
 
-router.get('/:id', checkAuth('ADMIN'), async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const { id } = req.params
 
   // Validate if id is a valid ObjectId

@@ -6,16 +6,17 @@ const productSchema = new mongoose.Schema(
       type: String,
       index: true,
       required: true,
-      unique: true,
     },
     image: {
       type: String,
-      dafault: "public/images/products/default.png",
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-    },
+    category:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+      }
+
+    ],
     description: {
       type: String,
       required: true,

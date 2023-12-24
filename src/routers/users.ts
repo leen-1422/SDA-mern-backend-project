@@ -12,21 +12,21 @@ import User from '../models/user'
 const router = express.Router()
 
 //get list of users by admin
-router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
+
+router.get('/', async (req, res, next) => {
   const users = await User.find()
-  // .populate('orderId')
   res.json({
     users,
   })
 })
 
 //delete a user by an admin
-router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
+router.delete('/:userId', async (req, res, next) => {
   try {
     const { userId } = req.params
     const user = await User.findByIdAndDelete(userId)
     if (!user) {
-      next(ApiError.badRequest('The user is deleted.'))
+      return next(ApiError.badRequest('The user is deleted.'))
     }
     res.status(200).json(user)
   } catch (error) {
@@ -34,50 +34,51 @@ router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
   }
 })
 //update for an admin
-router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
-  try {
-    const { id } = req.params
-    const user = await User.findByIdAndUpdate(id, req.body)
-    if (!user) {
-      return res.status(404).json({
-        message: `cannot find user with ${id}`,
-      })
-    }
-    const updatedUser = await User.findById(id)
-    res.status(200).json(updatedUser)
-  } catch (error) {
-    res.status(500).json({
-      message: 'cannot find id',
-    })
-  }
-})
+
+// router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
+//   try {
+//     const { id } = req.params
+//     const user = await User.findByIdAndUpdate(id, req.body)
+//     if (!user) {
+//       return res.status(404).json({
+//         message: `cannot find user with ${id}`,
+//       })
+//     }
+//     const updatedUser = await User.findById(id)
+//     res.status(200).json(updatedUser)
+//   } catch (error) {
+//     res.status(500).json({
+//       message: 'cannot find id',
+//     })
+//   }
+// })
 
 //block user by an admin
-router.put('/block/:userId', checkAuth('ADMIN'), async (req, res) => {
+router.put('/block/:userId', async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const user = await User.findById(userId);
+    const userId = req.params.userId
+    const user = await User.findById(userId)
 
     if (!user) {
       return res.status(404).json({
         message: `Cannot find user with userId: ${userId}`,
-      });
+      })
     }
-    user.blocked = !user.blocked;
+    user.blocked = !user.blocked
 
-    const updatedUser = await user.save();
+    const updatedUser = await user.save()
 
     res.status(200).json({
       message: `User ${user.blocked ? 'blocked' : 'unblocked'} successfully`,
       user: updatedUser,
-    });
+    })
   } catch (error) {
-    console.error('Error with blocking/unblocking user', error);
+    console.error('Error with blocking/unblocking user', error)
     res.status(500).json({
       message: 'Internal server error',
-    });
+    })
   }
-});
+})
 
 //  Get user by ID
 router.get('/:userId', async (req, res) => {
@@ -96,64 +97,48 @@ router.get('/:userId', async (req, res) => {
   }
 })
 
+//login test
 // POST => login
-router.post('/login', validateLoginUser, async (req, res) => {
+router.post('/login', validateLoginUser, async (req, res, next) => {
   const { email, password } = req.validatedLoginUser
-  try {
-    const user = await User.findOne({ email }).exec()
-
-    if (!user) {
-      return res.status(401).json({
-        msg: 'Auth failed',
-      })
-    }
-    // to compare hash password with the login passowrd
-    bcrypt.compare(password, user.password, (err, result) => {
-      if (err) {
-        return res.status(401).json({
-          msg: 'Auth failed',
-        })
-      }
-      if (result) {
-        const token = jwt.sign(
-          {
-            email: user.email,
-            userId: user._id,
-            role: user.role,
-          },
-          process.env.TOKEN_SECRET as string,
-          {
-            expiresIn: '24h',
-          }
-        )
-        return res.status(200).json({
-          msg: 'Auth successfull',
-          token: token,
-        })
-      } else {
-        return res.status(401).json({
-          msg: 'Auth failed',
-        })
-      }
-    })
-  } catch (error) {
-    console.log('Error in login', error)
-    return res.status(500).json({
-      message: 'Cannot find user',
-    })
+  const user = await User.findOne({ email })
+  if (!user || !user.isActive) {
+    next(ApiError.badRequest('invalid email or account not activated'))
+    return
   }
+  const isPassValid = await bcrypt.compare(password, user.password)
+  if (!isPassValid) {
+    next(ApiError.badRequest('invalid email or password'))
+    return
+  }
+  const payload = {
+    email: user.email,
+    userId: user._id,
+    role: user.role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  }
+
+  const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
+    expiresIn: '24h',
+  })
+
+  const userWithoutPassword = await User.findOne({ email }).select({ password: 0 })
+
+  res.status(200).json({
+    msg: 'login successfull',
+    token: token,
+    user: userWithoutPassword,
+    decodedUser: payload,
+  })
 })
 
 // update user profile by user
-router.put('/profile/:userId', checkAuth('USER'), async (req, res) => {
+router.put('/profile/:userId', async (req, res) => {
   try {
     const { firstName, lastName } = req.body
     const userId = req.params.userId
-    if (!firstName || !lastName) {
-      return res.status(400).json({
-        message: 'Both firstName and lastName are required for the update',
-      })
-    }
+
     const updatedUser = await User.findByIdAndUpdate(userId, { firstName, lastName }, { new: true })
     if (!updatedUser) {
       return res.status(404).json({
@@ -245,6 +230,14 @@ router.get('/activateUser/:activationToken', async (req, res, next) => {
   await user.save()
   res.status(200).json({
     msg: 'Account activated successfully',
+  })
+})
+router.put('/role', checkAuth('ADMIN'), async (req, res) => {
+  const userId = req.body.userId
+  const role = req.body.role
+  const user = await User.findOneAndUpdate({ _id: userId }, { role }, { new: true })
+  res.json({
+    user,
   })
 })
 export default router

@@ -15,7 +15,7 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
       .string()
       .min(3, { message: 'Name must have at least 3 characters' })
       .max(20, { message: 'Name can have at most 30 characters' }),
-    role: zod.string(),
+   
   })
 
   try {
@@ -53,7 +53,7 @@ export function validateLoginUser(req: Request, res: Response, next: NextFunctio
 export function validateProducts(req: Request, res: Response, next: NextFunction) {
   const Schema = zod.object({
     name: zod.string().min(1).max(40),
-    category: zod.string(),
+    category: zod.array(zod.string()),
     description: zod.string(),
     sizes: zod.array(zod.string()),
     price: zod.number().min(0),
@@ -67,6 +67,7 @@ export function validateProducts(req: Request, res: Response, next: NextFunction
       next(ApiError.badValidationRequest(err.errors))
       return
     }
+    console.log("post error",err)
     next(ApiError.internal('somthing went wrong'))
   }
 }

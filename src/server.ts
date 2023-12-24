@@ -1,7 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
 
@@ -10,10 +10,26 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
 const URL = process.env.ATLAS_URL as string
+const enviroment = process.env.NODE_ENV || 'development'
+const whitelist = ['myownfrontenddomain.com']
+if (enviroment === 'development') {
+  whitelist.push('http://localhost:3000')
+}
+
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    const isOriginAllowd = origin && whitelist.indexOf(origin) !== -1
+    if (isOriginAllowd) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+}
 
 // Middleware
 
-if (process.env.NODE_ENV === 'development') {
+if (enviroment === 'development') {
   app.use(myLogger)
 }
 app.use(express.urlencoded({ extended: true }))

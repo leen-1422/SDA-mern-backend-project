@@ -10,7 +10,7 @@ const router = express.Router()
 // get all orders
 router.get('/', async (req, res, next) => {
   try {
-    const orders = await Order.find().populate('orderItems').populate('userId').sort('purchasedAt')
+    const orders = await Order.find().populate({ path: 'orderItems', populate: { path: 'product' }  }).populate('userId').sort('purchasedAt')
     res.json(orders)
   } catch (error) {
     console.error(error)
@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 //create an order
-router.post('/create', validateOrder, checkAuth('ADMIN'), async (req, res, next) => {
+router.post('/', validateOrder, checkAuth('USER') , async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -46,7 +46,7 @@ router.post('/create', validateOrder, checkAuth('ADMIN'), async (req, res, next)
     console.log(totalPrices)
     const totalPrice = totalPrices.reduce((a, b) => a + b, 0)
 
-    console.log(orderIds, 'error is here')
+   
     const { userId, purchasedAt, status, total, shippingAddress, city, zipCode, country, phone } =
       req.body
 
@@ -71,10 +71,9 @@ router.post('/create', validateOrder, checkAuth('ADMIN'), async (req, res, next)
   }
 })
 // Update Order
-router.put('/:orderId', checkAuth('ADMIN'), async (req, res) => {
+router.put('/:orderId', checkAuth('ADMIN'),   async (req, res) => {
   const newStatus = req.body.status;
   const orderId = req.params.orderId;
-
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
@@ -94,7 +93,7 @@ router.put('/:orderId', checkAuth('ADMIN'), async (req, res) => {
 });
 
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', checkAuth('ADMIN'),  async (req, res, next) => {
   const { id } = req.params
   try {
     Order.findByIdAndDelete(id).then(async (order) => {
@@ -112,7 +111,7 @@ router.delete('/:id', async (req, res, next) => {
     next(ApiError.internal('Something went wrong.'))
   }
 })
-router.get('/:orderId', async (req, res) => {
+router.get('/:orderId', checkAuth('ADMIN'), async (req, res) => {
   try {
     const orderId = req.params.orderId
     const order = await Order.findById(orderId)

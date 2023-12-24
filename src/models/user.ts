@@ -9,11 +9,11 @@ function validateRole(role: string) {
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    required: true,
+    
   },
   lastName: {
     type: String,
-    required: true,
+   
   },
   blocked: {
     type: Boolean,
@@ -41,11 +41,7 @@ const userSchema = new mongoose.Schema({
     validate: [validateRole, 'Role has to be either USER or ADMIN'],
   },
 
-  // orderId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Order',
-  //   required: true,
-  // },
+
 })
 
 export default mongoose.model('Client', userSchema)
