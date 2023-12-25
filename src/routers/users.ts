@@ -120,7 +120,7 @@ router.post('/login', validateLoginUser, async (req, res, next) => {
   }
 
   const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-    expiresIn: '24h',
+    expiresIn: '20s',
   })
 
   const userWithoutPassword = await User.findOne({ email }).select({ password: 0 })
