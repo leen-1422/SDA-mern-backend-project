@@ -6,7 +6,12 @@ import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import ApiError from '../errors/ApiError'
 import { checkAuth } from '../middlewares/checkAuth'
-import { validateForgotPaswwordUser, validateLoginUser, validateResetPasswordUser, validateUser } from '../middlewares/validations'
+import {
+  validateForgotPaswwordUser,
+  validateLoginUser,
+  validateResetPasswordUser,
+  validateUser,
+} from '../middlewares/validations'
 import User from '../models/user'
 
 const router = express.Router()
@@ -120,7 +125,7 @@ router.post('/login', validateLoginUser, async (req, res, next) => {
   }
 
   const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-    expiresIn: '20s',
+    expiresIn: '24h',
   })
 
   const userWithoutPassword = await User.findOne({ email }).select({ password: 0 })
