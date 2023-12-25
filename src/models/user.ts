@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     default: 'USER',
     validate: [validateRole, 'Role has to be either USER or ADMIN'],
   },
+  forgotPasswordCode: {
+    type: String,
+  },
+  
 
 
 })

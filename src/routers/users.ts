@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import ApiError from '../errors/ApiError'
 import { checkAuth } from '../middlewares/checkAuth'
-import { validateLoginUser, validateUser } from '../middlewares/validations'
+import { validateForgotPaswwordUser, validateLoginUser, validateResetPasswordUser, validateUser } from '../middlewares/validations'
 import User from '../models/user'
 
 const router = express.Router()
@@ -188,6 +188,26 @@ async function sendActivationEmail(userEmail: string, activationToken: string) {
   const info = await transporter.sendMail(mailOptions)
   console.log('info', info)
 }
+// forgot password
+export async function sendForgotPasswordEmail(userEmail: string, forgotPasswordCode: string) {
+  const resetPasswordLink = `${process.env.MAILER_FORGOT_PASSWORD_DOMAIN}/reset-password/${forgotPasswordCode}`
+  console.log('forgotPasswordCode', forgotPasswordCode)
+  const mailOptions = {
+    from: process.env.MAILER_USER,
+    to: userEmail,
+    subject: 'Forgot Password?',
+    html: `<div style="background-color: #F2F2F2; padding: 20px;">
+    <h2 style="color: #333;">Forgot Password</h2>
+    <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">Hello </p>
+    <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">
+      Click the button below to reset your password:
+    </p>
+    <a href="${resetPasswordLink}" style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none; padding: 10px 16px; font-size: 16px; border-radius: 4px;">Reset Password</a>
+  </div>`,
+  }
+  const info = await transporter.sendMail(mailOptions)
+  console.log('info', info)
+}
 //register an user
 router.post('/register', validateUser, async (req, res, next) => {
   const { email, password, firstName, lastName } = req.validateUser
@@ -215,6 +235,44 @@ router.post('/register', validateUser, async (req, res, next) => {
     msg: 'User registered , Please Check your email to activate your account ',
     user: newUser,
   })
+})
+// resest the password
+router.post('/reset-pass', validateResetPasswordUser, async (req, res) => {
+  const password = req.resetPassUser.password // we will return it from object in index file, not from body
+  const forgotPasswordCode = req.resetPassUser.forgotPasswordCode
+  const hashedPassword = await bcrypt.hash(password, 10)
+  // find by this
+  const user = await User.findOne({ forgotPasswordCode })
+  if (!user) {
+    return res.json({ msg: 'Password did not reset' })
+  }
+  user.forgotPasswordCode = undefined
+  user.password = hashedPassword
+  await user.save()
+  res.json({
+    msg: 'Password is reset ',
+  })
+})
+// forgot password
+router.post('/forgot-password', validateForgotPaswwordUser, async (req, res, next) => {
+  const { email } = req.forgotPassUser
+  try {
+    const userExists = await User.findOne({ email })
+    if (!userExists || !userExists.isActive) {
+      return next(
+        ApiError.badRequest('Email does not exists or are you sure activated your email?')
+      )
+    }
+    const forgotPasswordCode = generateActivationToken()
+    await User.updateOne({ email }, { forgotPasswordCode })
+    await sendForgotPasswordEmail(email, forgotPasswordCode)
+    res.json({
+      msg: ' Check your email to reset your password ',
+    })
+  } catch (error) {
+    console.log('error:', error)
+    next(ApiError.badRequest('somthing went wrong '))
+  }
 })
 // we recive activation token as a params
 router.get('/activateUser/:activationToken', async (req, res, next) => {

@@ -15,7 +15,6 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
       .string()
       .min(3, { message: 'Name must have at least 3 characters' })
       .max(20, { message: 'Name can have at most 30 characters' }),
-   
   })
 
   try {
@@ -67,7 +66,7 @@ export function validateProducts(req: Request, res: Response, next: NextFunction
       next(ApiError.badValidationRequest(err.errors))
       return
     }
-    console.log("post error",err)
+    console.log('post error', err)
     next(ApiError.internal('somthing went wrong'))
   }
 }
@@ -118,5 +117,40 @@ export function validateCategory(req: Request, res: Response, next: NextFunction
     } else {
       next(ApiError.internal('something went wrong'))
     }
+  }
+}
+export function validateForgotPaswwordUser(req: Request, res: Response, next: NextFunction) {
+  const Schema = zod.object({
+    email: zod.string().email(),
+  })
+  try {
+    const forgotPassUser = Schema.parse(req.body)
+    req.forgotPassUser = forgotPassUser
+    next()
+  } catch (error) {
+    const err = error
+    if (err instanceof ZodError) {
+      next(ApiError.badValidationRequest(err.errors))
+      return
+    }
+    next(ApiError.internal('somthing went wrong'))
+  }
+}
+export function validateResetPasswordUser(req: Request, res: Response, next: NextFunction) {
+  const Schema = zod.object({
+    password: zod.string(),
+    forgotPasswordCode: zod.string(),
+  })
+  try {
+    const resetPassUser = Schema.parse(req.body)
+    req.resetPassUser = resetPassUser
+    next()
+  } catch (error) {
+    const err = error
+    if (err instanceof ZodError) {
+      next(ApiError.badValidationRequest(err.errors))
+      return
+    }
+    next(ApiError.internal('somthing went wrong'))
   }
 }
