@@ -8,7 +8,7 @@ import { checkAuth } from '../middlewares/checkAuth'
 
 const router = express.Router()
 // get all orders
-router.get('/', async (req, res, next) => {
+router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const orders = await Order.find().populate({ path: 'orderItems', populate: { path: 'product' }  }).populate('userId').sort('purchasedAt')
     res.json(orders)

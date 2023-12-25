@@ -18,7 +18,7 @@ const router = express.Router()
 
 //get list of users by admin
 
-router.get('/', async (req, res, next) => {
+router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
   const users = await User.find()
   res.json({
     users,
@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
 })
 
 //delete a user by an admin
-router.delete('/:userId', async (req, res, next) => {
+router.delete('/:userId', checkAuth('ADMIN'), async (req, res, next) => {
   try {
     const { userId } = req.params
     const user = await User.findByIdAndDelete(userId)
@@ -38,28 +38,10 @@ router.delete('/:userId', async (req, res, next) => {
     res.status(500).json({ message: 'error ' })
   }
 })
-//update for an admin
 
-// router.put('/:id', checkAuth('ADMIN'), async (req, res) => {
-//   try {
-//     const { id } = req.params
-//     const user = await User.findByIdAndUpdate(id, req.body)
-//     if (!user) {
-//       return res.status(404).json({
-//         message: `cannot find user with ${id}`,
-//       })
-//     }
-//     const updatedUser = await User.findById(id)
-//     res.status(200).json(updatedUser)
-//   } catch (error) {
-//     res.status(500).json({
-//       message: 'cannot find id',
-//     })
-//   }
-// })
 
 //block user by an admin
-router.put('/block/:userId', async (req, res) => {
+router.put('/block/:userId', checkAuth('ADMIN'), async (req, res) => {
   try {
     const userId = req.params.userId
     const user = await User.findById(userId)
@@ -86,7 +68,7 @@ router.put('/block/:userId', async (req, res) => {
 })
 
 //  Get user by ID
-router.get('/:userId', async (req, res) => {
+router.get('/:userId',checkAuth('ADMIN'), async (req, res) => {
   try {
     const userId = req.params.userId
     const user = await User.findById(userId)
@@ -139,7 +121,7 @@ router.post('/login', validateLoginUser, async (req, res, next) => {
 })
 
 // update user profile by user
-router.put('/profile/:userId', async (req, res) => {
+router.put('/profile/:userId', checkAuth('USER'), async (req, res) => {
   try {
     const { firstName, lastName } = req.body
     const userId = req.params.userId

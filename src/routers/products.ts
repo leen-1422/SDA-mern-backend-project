@@ -8,8 +8,7 @@ import Product from '../models/product'
 const router = express.Router()
 const ObjectId = mongoose.Types.ObjectId
 
-//get list of products
-
+//get list of products by user
 router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1
   const limit = Number(req.query.limit) || 4
@@ -79,7 +78,7 @@ router.get('/', async (req, res) => {
 
 //get list of products by admin
 
-router.get('/admin',  async (req, res, next) => {
+router.get('/admin', checkAuth('ADMIN'),  async (req, res, next) => {
   const products = await Product.find().populate('category')
   res.json({
     products,
