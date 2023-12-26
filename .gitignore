@@ -3,3 +3,4 @@ dist
 .env
 src/logs/requests.txt
 .vercel
+src/logs/*
