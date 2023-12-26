@@ -10,7 +10,10 @@ const router = express.Router()
 // get all orders
 router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
   try {
-    const orders = await Order.find().populate({ path: 'orderItems', populate: { path: 'product' }  }).populate('userId').sort('purchasedAt')
+    const orders = await Order.find()
+      .populate({ path: 'orderItems', populate: { path: 'product' } })
+      .populate('userId')
+      .sort('purchasedAt')
     res.json(orders)
   } catch (error) {
     console.error(error)
@@ -18,7 +21,7 @@ router.get('/', checkAuth('ADMIN'), async (req, res, next) => {
   }
 })
 //create an order
-router.post('/', validateOrder, checkAuth('USER') , async (req, res, next) => {
+router.post('/', validateOrder, checkAuth('USER'), async (req, res, next) => {
   try {
     const orderItemsId = Promise.all(
       req.body.orderItems.map(async (orderItem: { quantity: number; product: {} }) => {
@@ -46,7 +49,6 @@ router.post('/', validateOrder, checkAuth('USER') , async (req, res, next) => {
     console.log(totalPrices)
     const totalPrice = totalPrices.reduce((a, b) => a + b, 0)
 
-   
     const { userId, purchasedAt, status, total, shippingAddress, city, zipCode, country, phone } =
       req.body
 
@@ -71,29 +73,28 @@ router.post('/', validateOrder, checkAuth('USER') , async (req, res, next) => {
   }
 })
 // Update Order
-router.put('/:orderId', checkAuth('ADMIN'),   async (req, res) => {
-  const newStatus = req.body.status;
-  const orderId = req.params.orderId;
+router.put('/:orderId', checkAuth('ADMIN'), async (req, res) => {
+  const newStatus = req.body.status
+  const orderId = req.params.orderId
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       { status: newStatus },
       { new: true }
-    );
+    )
     if (!updatedOrder) {
-      console.error(`Order with ID ${orderId} not found`);
-      return res.status(404).json({ success: false, message: `Order with ID ${orderId} not found` });
+      console.error(`Order with ID ${orderId} not found`)
+      return res.status(404).json({ success: false, message: `Order with ID ${orderId} not found` })
     }
-    console.log('Order updated successfully:', updatedOrder);
-    res.json({ success: true, message: 'Order updated successfully', updatedOrder });
+    console.log('Order updated successfully:', updatedOrder)
+    res.json({ success: true, message: 'Order updated successfully', updatedOrder })
   } catch (error) {
-    console.error('Error updating order:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error('Error updating order:', error)
+    res.status(500).json({ success: false, message: 'Internal Server Error' })
   }
-});
+})
 
-
-router.delete('/:id', checkAuth('ADMIN'),  async (req, res, next) => {
+router.delete('/:id', checkAuth('ADMIN'), async (req, res, next) => {
   const { id } = req.params
   try {
     Order.findByIdAndDelete(id).then(async (order) => {
@@ -115,8 +116,10 @@ router.get('/:orderId', checkAuth('ADMIN'), async (req, res) => {
   try {
     const orderId = req.params.orderId
     const order = await Order.findById(orderId)
+      .populate({ path: 'orderItems', populate: { path: 'product' } })
+      .populate('userId')
     if (!order) {
-      return res.status(404).json({ error: 'User not found' })
+      return res.status(404).json({ error: 'Order not found' })
     }
     res.status(200).json(order)
   } catch (error) {

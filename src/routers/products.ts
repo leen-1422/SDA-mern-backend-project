@@ -8,77 +8,56 @@ import Product from '../models/product'
 const router = express.Router()
 const ObjectId = mongoose.Types.ObjectId
 
+export type SortOrder = 1 | -1
+type Filter = {
+  category?: string
+  name?: { $regex: RegExp }
+}
+
 //get list of products by user
 router.get('/', async (req, res) => {
-  const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 4
-  const startIndex = (page - 1) * limit
-  const lastIndex = page * limit
-  const search = req.query.search
-  const category = req.query.category
-  const sortBy = req.query.sortBy
-  // let searchQuery = {}
-  let searchQuery: { name?: { $regex: RegExp }; price?: { $gte: number }; category?: string } = {}
+  const filters: Filter = {}
+  const pageNumber: number = Number(req.query.pageNumber) || 1
+  const perPage: number = Number(req.query.perPage) || 4
+  const categoryId: string = req.query.categoryId as string
+  const sortField: string = (req.query.sortField as string) || 'price'
+  const sortOrder: SortOrder = req.query.sortOrder === 'high to low' ? -1 : 1
+  const sortOptions: { [key: string]: SortOrder } = { [sortField]: sortOrder }
 
-  if (search) {
-    searchQuery = { name: { $regex: new RegExp(String(req.query.name), 'i') } }
-  }
-  if (req.query.minPrice) {
-    searchQuery.price = { $gte: Number(req.query.minPrice) }
-  }
-  if (category && typeof category === 'string') {
-    searchQuery.category = category
+  const search: string = (req.query.search as string) || ''
+  const name = req.query.name
+
+  if (categoryId && typeof categoryId === 'string') {
+    //@ts-ignore
+    filters.category = { $in: categoryId }
   }
 
-  let sortOption = {}
-  if (sortBy) {
-    if (sortBy === 'price') {
-      const price = Number(req.query.price)
-      if (price === 1) {
-        sortOption = { price: 1 } // Ascending order
-      } else if (price === -1) {
-        sortOption = { price: -1 } // Descending order
-      }
-    } else if (sortBy === 'name') {
-      const name = Number(req.query.name)
-      if (name === 1) {
-        sortOption = { name: 1 } // Ascending order by name
-      } else if (name === -1) {
-        sortOption = { name: -1 } // Descending order by name
-      }
-    }
+  if (search && typeof search === 'string') {
+    filters.name = { $regex: new RegExp(search, 'i') }
   }
-
-  const result = { infoOfPage: {}, next: {}, previous: {}, result: [] as {} }
-  const products = await Product.find(searchQuery)
-    .sort(sortOption)
-    .populate('category')
-    .skip(startIndex)
-    .limit(limit)
-  const filteredCount = await Product.countDocuments(searchQuery)
-  const totalPages = Math.ceil(filteredCount / limit)
-  result.result = products
-
-  result.infoOfPage = {
-    page: page,
-    perPage: limit,
-    totalPages: totalPages,
-    totalItems: filteredCount,
+  try {
+    const products = await Product.find(filters)
+      .sort(sortOptions)
+      .skip((pageNumber - 1) * perPage)
+      .limit(perPage)
+      .populate('category')
+    const totalProducts = await Product.countDocuments(filters)
+    const totalPages = Math.ceil(totalProducts / perPage)
+    res.json({
+      pageNumber,
+      perPage,
+      totalProducts,
+      totalPages,
+      products,
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' })
   }
-
-  if (lastIndex < totalPages) {
-    result.next = {
-      page: page + 1,
-      limit: limit,
-    }
-  }
-
-  res.json(result)
 })
 
 //get list of products by admin
 
-router.get('/admin', checkAuth('ADMIN'),  async (req, res, next) => {
+router.get('/admin', checkAuth('ADMIN'), async (req, res, next) => {
   const products = await Product.find().populate('category')
   res.json({
     products,
